@@ -1,0 +1,69 @@
+import type { Maybe } from "Maybe"
+import type { Window } from "./Window"
+
+alias KeyEventData = {
+  alt :: Boolean,
+  code :: Short,
+  control :: Boolean,
+  scanCode :: Short,
+  shift :: Boolean,
+  system :: Boolean,
+}
+
+alias SizeEventData = { height :: Integer, width :: Integer }
+
+alias TextEventData = { char :: Char }
+
+alias MouseMoveEventData = { x :: Integer, y :: Integer }
+
+alias MouseButtons = {
+  Left :: Short,
+  Middle :: Short,
+  Right :: Short,
+  XButton1 :: Short,
+  XButton2 :: Short,
+}
+
+
+MouseButton :: MouseButtons
+export MouseButton = { Left: 0, Right: 1, Middle: 2, XButton1: 3, XButton2: 4 }
+
+alias MouseButtonEventData = { button :: Short, x :: Integer, y :: Integer }
+
+alias MouseMoveEventData = { x :: Integer, y :: Integer }
+
+alias JoystickButtonEventData = { button :: Short, joystickId :: Short }
+
+alias TouchEventData = { finger :: Short, x :: Integer, y :: Integer }
+
+alias JoystickConnectEventData = { joystickId :: Short }
+
+
+export type Event
+  = CloseEvent
+  | FocusGainEvent
+  | FocusLossEvent
+  | JoystickButtonPressEvent(JoystickButtonEventData)
+  | JoystickButtonReleaseEvent(JoystickButtonEventData)
+  | JoystickConnectEvent(JoystickConnectEventData)
+  | JoystickDisconnectEvent(JoystickConnectEventData)
+  | JoystickMoveEvent
+  | KeyPressedEvent(KeyEventData)
+  | KeyReleasedEvent(KeyEventData)
+  | MouseButtonPressEvent(MouseButtonEventData)
+  | MouseButtonReleaseEvent(MouseButtonEventData)
+  | MouseEnterEvent
+  | MouseLeaveEvent
+  | MouseMoveEvent(MouseMoveEventData)
+  | MouseWheelMoveEvent(MouseMoveEventData)
+  | MouseWheelScrollEvent
+  | SensorChangeEvent
+  | SizeEvent(SizeEventData)
+  | TextEnterEvent(TextEventData)
+  | TouchEndEvent(TouchEventData)
+  | TouchMoveEvent(TouchEventData)
+  | TouchStartEvent(TouchEventData)
+
+
+poll :: Window -> Maybe Event
+export poll = extern "madsfml__pollEvent"

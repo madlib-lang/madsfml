@@ -1,85 +1,86 @@
-import ByteArray from "ByteArray"
+import type { Circle } from "./Circle"
+import type { Color } from "./Color"
+import type { Event } from "./Event"
+import type { Window } from "./Window"
 
-type WebSocket = WebSocket
-export type WebSocket
+import CircleModule from "./Circle"
+import { Color } from "./Color"
+import EventModule from "./Event"
+import {
+  CloseEvent,
+FocusGainEvent,
+FocusLossEvent,
+JoystickButtonPressEvent,
+JoystickButtonReleaseEvent,
+JoystickConnectEvent,
+JoystickDisconnectEvent,
+JoystickMoveEvent,
+KeyPressedEvent,
+KeyReleasedEvent,
+MouseButtonPressEvent,
+MouseButtonReleaseEvent,
+MouseEnterEvent,
+MouseLeaveEvent,
+MouseMoveEvent,
+MouseWheelMoveEvent,
+MouseWheelScrollEvent,
+SensorChangeEvent,
+SizeEvent,
+TextEnterEvent,
+TouchEndEvent,
+TouchMoveEvent,
+TouchStartEvent,
+} from "./Event"
+import WindowModule from "./Window"
 
-// interface ErrnoException extends Error {
-//   errno?: number;
-//   code?: string;
-//   path?: string;
-//   syscall?: string;
-//   stack?: string;
-// }
-alias WebSocketError = {
-  errno :: String,
-  code :: String,
-  path :: String,
-  syscall :: String,
-  stack :: String,
+
+
+export Color
+export type Color
+
+
+export Circle = {
+  draw: CircleModule.draw,
+  make: CircleModule.make,
+  setFillColor: CircleModule.setFillColor,
+  setPosition: CircleModule.setPosition,
 }
 
-#iftarget js
+export type Circle
 
 
-#-
-import WebSocket from "ws";
--#
+export Window = {
+  create: WindowModule.create,
+  close: WindowModule.close,
+  display: WindowModule.display,
+  clear: WindowModule.clear,
+}
+
+export type Window
 
 
-connect :: String -> WebSocket
-export connect = (url) => #- new WebSocket(url) -#
-
-onConnected :: ({} -> {}) -> WebSocket -> {}
-export onConnected = (cb, ws) => #- ws.on("open", cb) -#
-
-onDisconnected :: ({} -> {}) -> WebSocket -> {}
-export onDisconnected = (cb, ws) => #- ws.on("close", cb) -#
-
-onError :: (WebSocketError -> {}) -> WebSocket -> {}
-export onError = (cb, ws) => #- ws.on("error", cb) -#
-
-onMessage :: (ByteArray -> {}) -> WebSocket -> {}
-export onMessage = (cb, ws) => #- ws.on("message", cb) -#
-
-send :: ByteArray -> WebSocket -> {}
-export send = (data, ws) => #- ws.send(data) -#
-
-disconnect :: WebSocket -> {}
-export disconnect = (ws) => #- ws.terminate() -#
-
-
-#elseif llvm
-
-connect :: String -> WebSocket
-export connect = extern "madwebsocketclient__connect"
-
-cancelConnection :: WebSocket -> {}
-export cancelConnection = extern "madwebsocketclient__cancelConnection"
-
-onConnected :: ({} -> {}) -> WebSocket -> {}
-export onConnected = extern "madwebsocketclient__onConnected"
-
-onDisconnected :: ({} -> {}) -> WebSocket -> {}
-export onDisconnected = extern "madwebsocketclient__onDisconnected"
-
-onMessage :: (ByteArray -> {}) -> WebSocket -> {}
-export onMessage = extern "madwebsocketclient__onMessage"
-
-onErrorFFI :: (WebSocketError -> {}) -> WebSocket -> {}
-onErrorFFI = extern "madwebsocketclient__onError"
-
-export onError = (cb, ws) => onErrorFFI(() => cb({
-  errno: "ECONNREFUSED",
-  code: "ECONNREFUSED",
-  path: "",
-  syscall: "",
-  stack: "",
-}), ws)
-
-send :: ByteArray -> WebSocket -> {}
-export send = extern "madwebsocketclient__send"
-
-disconnect :: WebSocket -> {}
-export disconnect = extern "madwebsocketclient__disconnect"
-
-#endif
+export Event = { poll: EventModule.poll, MouseButton: EventModule.MouseButton }
+export CloseEvent
+export FocusGainEvent
+export FocusLossEvent
+export JoystickButtonPressEvent
+export JoystickButtonReleaseEvent
+export JoystickConnectEvent
+export JoystickDisconnectEvent
+export JoystickMoveEvent
+export KeyPressedEvent
+export KeyReleasedEvent
+export MouseButtonPressEvent
+export MouseButtonReleaseEvent
+export MouseEnterEvent
+export MouseLeaveEvent
+export MouseMoveEvent
+export MouseWheelMoveEvent
+export MouseWheelScrollEvent
+export SensorChangeEvent
+export SizeEvent
+export TextEnterEvent
+export TouchEndEvent
+export TouchMoveEvent
+export TouchStartEvent
+export type Event

@@ -1,10 +1,25 @@
+import type { Color } from "./Color"
+import { colorToShort } from "./Color"
+
 type Window = __Window__
 export type Window
 
 
-createWindow :: Integer -> Integer -> String -> Window
-export createWindow = extern "madsfml__createWindow"
+create :: Integer -> Integer -> String -> Window
+export create = extern "madsfml__createWindow"
 
-closeWindow :: Window -> {}
-export closeWindow = extern "madsfml__closeWindow"
+close :: Window -> {}
+export close = extern "madsfml__closeWindow"
 
+display :: Window -> {}
+export display = extern "madsfml__display"
+
+clearWindowFFI :: Short -> Window -> {}
+clearWindowFFI = extern "madsfml__clearWindow"
+
+
+clear :: Color -> Window -> {}
+export clear = (color, window) => pipe(
+  colorToShort,
+  clearWindowFFI($, window),
+)(color)

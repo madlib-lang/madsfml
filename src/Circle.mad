@@ -7,20 +7,20 @@ export type Circle
 
 
 
-makeCircle :: Float -> Short -> Circle
-export makeCircle = extern "madsfml__makeCircle"
+make :: Float -> Short -> Circle
+export make = extern "madsfml__makeCircle"
 
 setCircleFillColorFFI :: Short -> Circle -> Circle
 setCircleFillColorFFI = extern "madsfml__setCircleFillColor"
 
-setCircleFillColor :: Color -> Circle -> Circle
-export setCircleFillColor = (c, circle) => pipe(
+setFillColor :: Color -> Circle -> Circle
+export setFillColor = (c, circle) => pipe(
   colorToShort,
   setCircleFillColorFFI($, circle)
 )(c)
 
-setCirclePosition :: Float -> Float -> Circle -> Circle
-export setCirclePosition = extern "madsfml__setCirclePosition"
+setPosition :: Float -> Float -> Circle -> Circle
+export setPosition = extern "madsfml__setCirclePosition"
 
-drawCircle :: Circle -> Window -> {}
-export drawCircle = extern "madsfml__drawCircle"
+draw :: Circle -> Window -> {}
+export draw = extern "madsfml__drawCircle"

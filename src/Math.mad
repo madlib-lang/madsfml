@@ -1,0 +1,3 @@
+export type Vector2 a = Vector2(a, a)
+
+export alias Rect a = { height :: a, left :: a, top :: a, width :: a }
