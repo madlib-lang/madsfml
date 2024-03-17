@@ -1,0 +1,16 @@
+{
+  "name": "MadSFML",
+  "version": "0.0.1",
+  "main": "src/Main.mad",
+  "hooks": {
+    "postInstall": "./scripts/build-lib"
+  },
+  "staticLibs": [
+    "lib/lib/libsfml-audio-s.a",
+    "lib/lib/libsfml-graphics-s.a",
+    "lib/lib/libsfml-network-s.a",
+    "lib/lib/libsfml-window-s.a",
+    "lib/lib/libsfml-system-s.a",
+    "lib/build/libmadsfml.a"
+  ]
+}

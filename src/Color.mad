@@ -1,0 +1,13 @@
+import Short from "Short"
+
+
+export type Color = Color(Byte, Byte, Byte, Byte)
+
+colorToShort :: Color -> Short
+export colorToShort = where {
+  Color(r, g, b, a) =>
+    (Short.fromByte(r) << 24)
+      + (Short.fromByte(g) << 16)
+      + (Short.fromByte(b) << 8)
+      + Short.fromByte(a)
+}

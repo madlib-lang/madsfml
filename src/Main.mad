@@ -1,0 +1,85 @@
+import ByteArray from "ByteArray"
+
+type WebSocket = WebSocket
+export type WebSocket
+
+// interface ErrnoException extends Error {
+//   errno?: number;
+//   code?: string;
+//   path?: string;
+//   syscall?: string;
+//   stack?: string;
+// }
+alias WebSocketError = {
+  errno :: String,
+  code :: String,
+  path :: String,
+  syscall :: String,
+  stack :: String,
+}
+
+#iftarget js
+
+
+#-
+import WebSocket from "ws";
+-#
+
+
+connect :: String -> WebSocket
+export connect = (url) => #- new WebSocket(url) -#
+
+onConnected :: ({} -> {}) -> WebSocket -> {}
+export onConnected = (cb, ws) => #- ws.on("open", cb) -#
+
+onDisconnected :: ({} -> {}) -> WebSocket -> {}
+export onDisconnected = (cb, ws) => #- ws.on("close", cb) -#
+
+onError :: (WebSocketError -> {}) -> WebSocket -> {}
+export onError = (cb, ws) => #- ws.on("error", cb) -#
+
+onMessage :: (ByteArray -> {}) -> WebSocket -> {}
+export onMessage = (cb, ws) => #- ws.on("message", cb) -#
+
+send :: ByteArray -> WebSocket -> {}
+export send = (data, ws) => #- ws.send(data) -#
+
+disconnect :: WebSocket -> {}
+export disconnect = (ws) => #- ws.terminate() -#
+
+
+#elseif llvm
+
+connect :: String -> WebSocket
+export connect = extern "madwebsocketclient__connect"
+
+cancelConnection :: WebSocket -> {}
+export cancelConnection = extern "madwebsocketclient__cancelConnection"
+
+onConnected :: ({} -> {}) -> WebSocket -> {}
+export onConnected = extern "madwebsocketclient__onConnected"
+
+onDisconnected :: ({} -> {}) -> WebSocket -> {}
+export onDisconnected = extern "madwebsocketclient__onDisconnected"
+
+onMessage :: (ByteArray -> {}) -> WebSocket -> {}
+export onMessage = extern "madwebsocketclient__onMessage"
+
+onErrorFFI :: (WebSocketError -> {}) -> WebSocket -> {}
+onErrorFFI = extern "madwebsocketclient__onError"
+
+export onError = (cb, ws) => onErrorFFI(() => cb({
+  errno: "ECONNREFUSED",
+  code: "ECONNREFUSED",
+  path: "",
+  syscall: "",
+  stack: "",
+}), ws)
+
+send :: ByteArray -> WebSocket -> {}
+export send = extern "madwebsocketclient__send"
+
+disconnect :: WebSocket -> {}
+export disconnect = extern "madwebsocketclient__disconnect"
+
+#endif

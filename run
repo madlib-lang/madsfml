@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make -C lib -j
+LDFLAGS="-framework AppKit -framework IOKit -framework Carbon -framework CoreGraphics -framework OpenAL -ObjC" madlib run -t llvm src/Test.mad

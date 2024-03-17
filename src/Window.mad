@@ -1,0 +1,10 @@
+type Window = __Window__
+export type Window
+
+
+createWindow :: Integer -> Integer -> String -> Window
+export createWindow = extern "madsfml__createWindow"
+
+closeWindow :: Window -> {}
+export closeWindow = extern "madsfml__closeWindow"
+
