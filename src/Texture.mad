@@ -1,0 +1,10 @@
+
+type Texture = __Circle__
+export type Texture
+
+
+make :: {} -> Texture
+export make = extern "madsfml__texture__make"
+
+loadFromFile :: String -> Texture -> Boolean
+export loadFromFile = extern "madsfml__texture__loadFromFile"

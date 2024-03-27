@@ -43,6 +43,12 @@ sf::RenderWindow *madsfml__createWindow(int64_t w, int64_t h, char *name) {
   return new sf::RenderWindow(sf::VideoMode(w, h), std::string(name));
 }
 
+sf::RenderWindow *madsfml__createWindowWithSettings(int64_t w, int64_t h, char *name, int32_t antialiasingLevel) {
+  sf::ContextSettings settings;
+  settings.antialiasingLevel = antialiasingLevel;
+  return new sf::RenderWindow(sf::VideoMode(w, h), std::string(name), sf::Style::Default, settings);
+}
+
 
 void madsfml__closeWindow(sf::RenderWindow *window) {
   window->close();

@@ -1,0 +1,36 @@
+type Shader = __Shader__
+export type Shader
+
+
+export type Type = Vertex | Geometry | Fragment
+
+
+typeToSFMLType = where {
+    Vertex =>
+    0
+
+  Geometry =>
+    1
+
+  Fragment =>
+    2
+}
+
+
+new :: {} -> Shader
+export new = extern "madsfml__shader__new"
+
+loadFromFileFFI :: String -> Short -> Shader -> Boolean
+loadFromFileFFI = extern "madsfml__shader__loadFromFile"
+
+loadFromFile :: String -> Type -> Shader -> Boolean
+export loadFromFile = (path, t, shader) => loadFromFileFFI(path, typeToSFMLType(t), shader)
+
+loadFromMemoryFFI :: String -> Short -> Shader -> Boolean
+loadFromMemoryFFI = extern "madsfml__shader__loadFromMemory"
+
+loadFromMemory :: String -> Type -> Shader -> Boolean
+export loadFromMemory = (path, t, shader) => loadFromMemoryFFI(path, typeToSFMLType(t), shader)
+
+setCurrentTexture :: Shader -> {}
+export setCurrentTexture = extern "setCurrentTexture"

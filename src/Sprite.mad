@@ -1,0 +1,15 @@
+import type { Texture } from "./Texture"
+import type { Window } from "./Window"
+import type { Shader } from "./Shader"
+
+type Sprite = __Sprite__
+export type Sprite
+
+make :: Texture -> Sprite
+export make = extern "madsfml__sprite__make"
+
+draw :: Sprite -> Window -> {}
+export draw = extern "madsfml__sprite__draw"
+
+drawWithShader :: Sprite -> Shader -> Window -> {}
+export drawWithShader = extern "madsfml__sprite__drawWithShader"

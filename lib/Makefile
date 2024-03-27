@@ -8,6 +8,8 @@ BUILDDIR := build
 SRCDIR := src
 OBJS :=\
   $(BUILDDIR)/madsfml.o \
+  $(BUILDDIR)/shader.o \
+  $(BUILDDIR)/sprite.o \
   $(BUILDDIR)/circle.o
 
 MADLIB_RUNTIME_HEADERS_PATH := "$(shell madlib config runtime-headers-path)"
