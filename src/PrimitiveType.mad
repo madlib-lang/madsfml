@@ -1,0 +1,32 @@
+export type PrimitiveType
+  = Points
+  | Lines
+  | LineStrip
+  | Triangles
+  | TriangleStrip
+  | TriangleFan
+  | Quads
+
+primitiveTypeToShort :: PrimitiveType -> Short
+export primitiveTypeToShort = where {
+  Points =>
+    0
+
+  Lines =>
+    1
+
+  LineStrip =>
+    2
+
+  Triangles =>
+    3
+
+  TriangleStrip =>
+    4
+
+  TriangleFan =>
+    5
+
+  Quads =>
+    6
+}

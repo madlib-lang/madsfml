@@ -1,0 +1,20 @@
+import type { Shader } from "./Shader"
+import type { Texture } from "./Texture"
+import type { Transform } from "./Transform"
+
+
+
+type RenderStates = __RenderStates__
+export type RenderStates
+
+default :: {} -> RenderStates
+export default = extern "madsfml__renderstates__default"
+
+setTransform :: Transform -> RenderStates -> RenderStates
+export setTransform = extern "madsfml__renderstates__setTransform"
+
+setTexture :: Texture -> RenderStates -> RenderStates
+export setTexture = extern "madsfml__renderstates__setTexture"
+
+setShader :: Shader -> RenderStates -> RenderStates
+export setShader = extern "madsfml__renderstates__setShader"

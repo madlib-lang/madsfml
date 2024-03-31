@@ -1,6 +1,11 @@
 import type { Color } from "./Color"
+import type { RenderStates } from "./RenderStates"
+import type { Transform } from "./Transform"
 import type { Window } from "./Window"
+
 import { colorToShort } from "./Color"
+
+
 
 type Circle = __Circle__
 export type Circle
@@ -16,8 +21,11 @@ setCircleFillColorFFI = extern "madsfml__circle__setFillColor"
 setFillColor :: Color -> Circle -> Circle
 export setFillColor = (c, circle) => pipe(
   colorToShort,
-  setCircleFillColorFFI($, circle)
+  setCircleFillColorFFI($, circle),
 )(c)
+
+setOrigin :: Float -> Float -> Circle -> Circle
+export setOrigin = extern "madsfml__circle__setOrigin"
 
 setPosition :: Float -> Float -> Circle -> Circle
 export setPosition = extern "madsfml__circle__setPosition"
@@ -34,5 +42,11 @@ export setPointCount = extern "madsfml__circle__setPointCount"
 setRadius :: Short -> Circle -> Circle
 export setRadius = extern "madsfml__circle__setRadius"
 
+getTransform :: Circle -> Transform
+export getTransform = extern "madsfml__circle__getTransform"
+
 draw :: Circle -> Window -> {}
 export draw = extern "madsfml__circle__draw"
+
+drawWithRenderStates :: Circle -> RenderStates -> Window -> {}
+export drawWithRenderStates = extern "madsfml__circle__drawWithRenderStates"

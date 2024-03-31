@@ -7,10 +7,21 @@ INCLUDEDIR := include
 BUILDDIR := build
 SRCDIR := src
 OBJS :=\
-  $(BUILDDIR)/madsfml.o \
-  $(BUILDDIR)/shader.o \
-  $(BUILDDIR)/sprite.o \
-  $(BUILDDIR)/circle.o
+  $(BUILDDIR)/circle.o          \
+  $(BUILDDIR)/font.o            \
+  $(BUILDDIR)/madsfml.o         \
+  $(BUILDDIR)/math.o            \
+  $(BUILDDIR)/renderstates.o    \
+  $(BUILDDIR)/shader.o          \
+  $(BUILDDIR)/sprite.o          \
+  $(BUILDDIR)/text.o            \
+  $(BUILDDIR)/texture.o         \
+  $(BUILDDIR)/transform.o       \
+  $(BUILDDIR)/vertex.o          \
+  $(BUILDDIR)/vertexarray.o     \
+  $(BUILDDIR)/vertexbuffer.o    \
+  $(BUILDDIR)/view.o            \
+  $(BUILDDIR)/window.o
 
 MADLIB_RUNTIME_HEADERS_PATH := "$(shell madlib config runtime-headers-path)"
 MADLIB_RUNTIME_LIB_HEADERS_PATH := "$(shell madlib config runtime-lib-headers-path)"

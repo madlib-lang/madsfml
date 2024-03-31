@@ -1,0 +1,41 @@
+import type { Color } from "./Color"
+
+import { colorToShort } from "./Color"
+
+
+
+type Vertex = __Vertex__
+export type Vertex
+
+new :: {} -> Vertex
+export new = extern "madsfml__vertex__new"
+
+fromPosition :: Float -> Float -> Vertex
+export fromPosition = extern "madsfml__vertex__fromPosition"
+
+fromPositionAndColorFFI :: Float -> Float -> Short -> Vertex
+fromPositionAndColorFFI = extern "madsfml__vertex__fromPositionAndColor"
+
+fromPositionAndColor :: Float -> Float -> Color -> Vertex
+export fromPositionAndColor = (x, y, c) => pipe(
+  colorToShort,
+  fromPositionAndColorFFI(x, y),
+)(c)
+
+fromPositionAndTexCoords :: Float -> Float -> Float -> Float -> Vertex
+export fromPositionAndTexCoords = extern "madsfml__vertex__fromPositionAndTexCoords"
+
+setPosition :: Float -> Float -> Vertex -> Vertex
+export setPosition = extern "madsfml__vertex__setPosition"
+
+setColorFFI :: Short -> Vertex -> Vertex
+setColorFFI = extern "madsfml__vertex__setColor"
+
+setColor :: Color -> Vertex -> Vertex
+export setColor = (c, v) => pipe(
+  colorToShort,
+  setColorFFI($, v),
+)(c)
+
+setTexCoords :: Float -> Float -> Vertex -> Vertex
+export setTexCoords = extern "madsfml__vertex__setTexCoords"

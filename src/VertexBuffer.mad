@@ -1,0 +1,47 @@
+import type { PrimitiveType } from "./PrimitiveType"
+import type { RenderStates } from "./RenderStates"
+import type { Vertex } from "./Vertex"
+import type { Window } from "./Window"
+
+import { primitiveTypeToShort } from "./PrimitiveType"
+
+
+
+type VertexBuffer = __VertexBuffer__
+export type VertexBuffer
+
+make :: {} -> VertexBuffer
+export make = extern "madsfml__vertexbuffer__make"
+
+makeWithPrimitiveTypeFFI :: Short -> VertexBuffer
+export makeWithPrimitiveTypeFFI = extern "madsfml__vertexbuffer__makeWithPrimitiveType"
+
+makeWithPrimitiveType :: PrimitiveType -> VertexBuffer
+export makeWithPrimitiveType = (pt) => pipe(
+  primitiveTypeToShort,
+  makeWithPrimitiveTypeFFI,
+)(pt)
+
+allocate :: Short -> VertexBuffer -> Boolean
+export allocate = extern "madsfml__vertexbuffer__create"
+
+update :: Array Vertex -> VertexBuffer -> VertexBuffer
+export update = extern "madsfml__vertexbuffer__update"
+
+updateAt :: Array Vertex -> Short -> VertexBuffer -> VertexBuffer
+export updateAt = extern "madsfml__vertexbuffer__updateAt"
+
+setPrimitiveTypeFFI :: Short -> VertexBuffer -> VertexBuffer
+setPrimitiveTypeFFI = extern "madsfml__vertexbuffer__setPrimitiveType"
+
+setPrimitiveType :: PrimitiveType -> VertexBuffer -> VertexBuffer
+export setPrimitiveType = (pt, vb) => pipe(
+  primitiveTypeToShort,
+  setPrimitiveTypeFFI($, vb),
+)(pt)
+
+draw :: VertexBuffer -> Window -> {}
+export draw = extern "madsfml__vertexbuffer__draw"
+
+drawWithRenderStates :: VertexBuffer -> RenderStates -> Window -> {}
+export drawWithRenderStates = extern "madsfml__vertexbuffer__drawWithRenderStates"

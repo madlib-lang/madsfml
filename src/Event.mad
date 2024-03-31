@@ -1,5 +1,8 @@
 import type { Maybe } from "Maybe"
+
 import type { Window } from "./Window"
+
+
 
 alias KeyEventData = {
   alt :: Boolean,
@@ -10,11 +13,12 @@ alias KeyEventData = {
   system :: Boolean,
 }
 
-alias SizeEventData = { height :: Integer, width :: Integer }
+
+alias SizeEventData = { height :: Short, width :: Short }
 
 alias TextEventData = { char :: Char }
 
-alias MouseMoveEventData = { x :: Integer, y :: Integer }
+alias MouseMoveEventData = { x :: Short, y :: Short }
 
 alias MouseButtons = {
   Left :: Short,
@@ -28,13 +32,13 @@ alias MouseButtons = {
 MouseButton :: MouseButtons
 export MouseButton = { Left: 0, Right: 1, Middle: 2, XButton1: 3, XButton2: 4 }
 
-alias MouseButtonEventData = { button :: Short, x :: Integer, y :: Integer }
+alias MouseButtonEventData = { button :: Short, x :: Short, y :: Short }
 
-alias MouseMoveEventData = { x :: Integer, y :: Integer }
+alias MouseMoveEventData = { x :: Short, y :: Short }
 
 alias JoystickButtonEventData = { button :: Short, joystickId :: Short }
 
-alias TouchEventData = { finger :: Short, x :: Integer, y :: Integer }
+alias TouchEventData = { finger :: Short, x :: Short, y :: Short }
 
 alias JoystickConnectEventData = { joystickId :: Short }
 

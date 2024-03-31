@@ -10,3 +10,6 @@ a.out
 .buildlibs
 .vscode
 sprite.png
+arial.ttf
+.tests
+.repl

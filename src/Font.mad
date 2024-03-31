@@ -1,0 +1,10 @@
+
+type Font = __Font__
+export type Font
+
+
+make :: {} -> Font
+export make = extern "madsfml__font__make"
+
+loadFromFile :: String -> Font -> Boolean
+export loadFromFile = extern "madsfml__font__loadFromFile"

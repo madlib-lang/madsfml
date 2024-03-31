@@ -1,15 +1,95 @@
-import type { Texture } from "./Texture"
-import type { Window } from "./Window"
+import type { Color } from "./Color"
+import type { Rect, Vector2 } from "./Math"
+import type { RenderStates } from "./RenderStates"
 import type { Shader } from "./Shader"
+import type { Texture } from "./Texture"
+import type { Transform } from "./Transform"
+import type { Window } from "./Window"
+
+import { colorToShort, shortToColor } from "./Color"
+
+
 
 type Sprite = __Sprite__
 export type Sprite
 
+// --------- Sprite ---------------------------------------
+
 make :: Texture -> Sprite
 export make = extern "madsfml__sprite__make"
 
+setTexture :: Texture -> Sprite -> Sprite
+export setTexture = extern "madsfml__sprite__setTexture"
+
+getTextureRect :: Sprite -> Rect Short
+export getTextureRect = extern "madsfml__sprite__getTextureRect"
+
+setTextureRect :: Short -> Short -> Short -> Short -> Sprite -> Sprite
+export setTextureRect = extern "madsfml__sprite__setTextureRect"
+
+getColorFFI :: Sprite -> Short
+getColorFFI = extern "madsfml__sprite__getColor"
+
+getColor :: Sprite -> Color
+export getColor = (s) => pipe(
+  getColorFFI,
+  shortToColor,
+)(s)
+
+setColorFFI :: Short -> Sprite -> Sprite
+setColorFFI = extern "madsfml__sprite__setColor"
+
+setColor :: Color -> Sprite -> Sprite
+export setColor = (c, s) => pipe(
+  colorToShort,
+  setColorFFI($, s),
+)(c)
+
+getLocalBounds :: Sprite -> Rect Float
+export getLocalBounds = extern "madsfml__sprite__getLocalBounds"
+
+getGlocalBounds :: Sprite -> Rect Float
+export getGlocalBounds = extern "madsfml__sprite__getGlocalBounds"
+
+
+// --------- Transform ------------------------------------
+
+getOrigin :: Sprite -> Vector2 Float
+export getOrigin = extern "madsfml__sprite__getOrigin"
+
+setOrigin :: Float -> Float -> Sprite -> Sprite
+export setOrigin = extern "madsfml__sprite__setOrigin"
+
+getPosition :: Sprite -> Vector2 Float
+export getPosition = extern "madsfml__sprite__getPosition"
+
+setPosition :: Float -> Float -> Sprite -> Sprite
+export setPosition = extern "madsfml__sprite__setPosition"
+
+getRotation :: Sprite -> Float
+export getRotation = extern "madsfml__sprite__getRotation"
+
+setRotation :: Float -> Sprite -> Sprite
+export setRotation = extern "madsfml__sprite__setRotation"
+
+getScale :: Sprite -> Vector2 Float
+export getScale = extern "madsfml__sprite__getScale"
+
+setScale :: Float -> Float -> Sprite -> Sprite
+export setScale = extern "madsfml__sprite__setScale"
+
+getTransform :: Sprite -> Transform
+export getTransform = extern "madsfml__sprite__getTransform"
+
+
+
+// --------- Drawable -------------------------------------
+
 draw :: Sprite -> Window -> {}
 export draw = extern "madsfml__sprite__draw"
+
+drawWithRenderStates :: Sprite -> RenderStates -> Window -> {}
+export drawWithRenderStates = extern "madsfml__sprite__drawWithRenderStates"
 
 drawWithShader :: Sprite -> Shader -> Window -> {}
 export drawWithShader = extern "madsfml__sprite__drawWithShader"

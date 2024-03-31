@@ -1,0 +1,35 @@
+import type { PrimitiveType } from "./PrimitiveType"
+import type { RenderStates } from "./RenderStates"
+import type { Vertex } from "./Vertex"
+import type { Window } from "./Window"
+
+import { primitiveTypeToShort } from "./PrimitiveType"
+
+
+
+type VertexArray = __VertexArray__
+export type VertexArray
+
+make :: {} -> VertexArray
+export make = extern "madsfml__vertexarray__make"
+
+makeWithPrimitiveAndSizeFFI :: Short -> Short -> VertexArray
+makeWithPrimitiveAndSizeFFI = extern "madsfml__vertexarray__makeWithPrimitiveTypeAndSize"
+
+makeWithPrimitiveAndSize :: PrimitiveType -> Short -> VertexArray
+export makeWithPrimitiveAndSize = (pt, size) => pipe(
+  primitiveTypeToShort,
+  makeWithPrimitiveAndSizeFFI($, size),
+)(pt)
+
+set :: Short -> Vertex -> VertexArray -> VertexArray
+export set = extern "madsfml__vertexarray__set"
+
+get :: Short -> VertexArray -> Vertex
+export get = extern "madsfml__vertexarray__get"
+
+draw :: VertexArray -> Window -> {}
+export draw = extern "madsfml__vertexarray__draw"
+
+drawWithRenderStates :: VertexArray -> RenderStates -> Window -> {}
+export drawWithRenderStates = extern "madsfml__vertexarray__drawWithRenderStates"

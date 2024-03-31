@@ -1,0 +1,15 @@
+import { assertEquals, test } from "Test"
+
+import Color from "./Color"
+
+
+test(
+  "shortToColor",
+  () => assertEquals(
+    pipe(
+      Color.colorToShort,
+      Color.shortToColor,
+    )(Color.Color(255, 0, 0, 255)),
+    Color.Color(255, 0, 0, 255),
+  ),
+)

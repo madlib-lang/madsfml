@@ -1,6 +1,7 @@
 import Short from "Short"
 
 
+
 export type Color = Color(Byte, Byte, Byte, Byte)
 
 colorToShort :: Color -> Short
@@ -11,3 +12,11 @@ export colorToShort = where {
       + (Short.fromByte(b) << 8)
       + Short.fromByte(a)
 }
+
+shortToColor :: Short -> Color
+export shortToColor = (s) => Color(
+  Short.toByte(s >> 24 & 0xff),
+  Short.toByte(s >> 16 & 0xff),
+  Short.toByte(s >> 8& 0xff),
+  Short.toByte(s & 0xff),
+)

@@ -1,5 +1,5 @@
 
-type Texture = __Circle__
+type Texture = __Texture__
 export type Texture
 
 

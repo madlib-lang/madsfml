@@ -1,0 +1,20 @@
+type Transform = __Transform__
+export type Transform
+
+identity :: {} -> Transform
+export identity = extern "madsfml__transform__identity"
+
+make :: Float -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> Transform
+export make = extern "madsfml__transform__make"
+
+rotate :: Float -> Transform -> Transform
+export rotate = extern "madsfml__transform__rotate"
+
+rotateFrom :: Float -> Float -> Float -> Transform -> Transform
+export rotateFrom = extern "madsfml__transform__rotateFrom"
+
+scale :: Float -> Float -> Transform -> Transform
+export scale = extern "madsfml__transform__scale"
+
+scaleFrom :: Float -> Float -> Float -> Float -> Transform -> Transform
+export scaleFrom = extern "madsfml__transform__scaleFrom"

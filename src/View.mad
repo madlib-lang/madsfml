@@ -1,0 +1,40 @@
+import type { Rect, Vector2 } from "./Math"
+
+
+
+type View = __View__
+export type View
+
+
+make :: {} -> View
+export make = extern "madsfml__view__make"
+
+makeWithRect :: Float -> Float -> Float -> Float -> View
+export makeWithRect = extern "madsfml__view__makeWithRect"
+
+setSize :: Float -> Float -> View -> View
+export setSize = extern "madsfml__view__setSize"
+
+setCenter :: Float -> Float -> View -> View
+export setCenter = extern "madsfml__view__setCenter"
+
+setRotation :: Float -> View -> View
+export setRotation = extern "madsfml__view__setRotation"
+
+setViewport :: Float -> Float -> Float -> Float -> View -> View
+export setViewport = extern "madsfml__view__setViewport"
+
+reset :: Float -> Float -> Float -> Float -> View -> View
+export reset = extern "madsfml__view__reset"
+
+getSize :: View -> Vector2 Float
+export getSize = extern "madsfml__view__getSize"
+
+getCenter :: View -> Vector2 Float
+export getCenter = extern "madsfml__view__getCenter"
+
+getRotation :: View -> Float
+export getRotation = extern "madsfml__view__getRotation"
+
+getViewport :: View -> Rect Float
+export getViewport = extern "madsfml__view__getViewport"
