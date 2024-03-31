@@ -2,6 +2,7 @@ import type { Color } from "./Color"
 import type { RenderStates } from "./RenderStates"
 import type { Transform } from "./Transform"
 import type { Window } from "./Window"
+import type { Rect, Vector2 } from "./Math"
 
 import { colorToShort } from "./Color"
 
@@ -15,6 +16,12 @@ export type Circle
 make :: Float -> Circle
 export make = extern "madsfml__circle__make"
 
+getRadius :: Circle -> Short
+export getRadius = extern "madsfml__circle__getRadius"
+
+setRadius :: Short -> Circle -> Circle
+export setRadius = extern "madsfml__circle__setRadius"
+
 setCircleFillColorFFI :: Short -> Circle -> Circle
 setCircleFillColorFFI = extern "madsfml__circle__setFillColor"
 
@@ -24,26 +31,64 @@ export setFillColor = (c, circle) => pipe(
   setCircleFillColorFFI($, circle),
 )(c)
 
+setOutlineColorFFI :: Short -> Circle -> Circle
+setOutlineColorFFI = extern "madsfml__circle__setOutlineColor"
+
+setOutlineColor :: Color -> Circle -> Circle
+export setOutlineColor = (c, t) => pipe(
+  colorToShort,
+  setOutlineColorFFI($, t),
+)(c)
+
+setOutlineThickness :: Float -> Circle -> Circle
+export setOutlineThickness = extern "madsfml__circle__setOutlineThickness"
+
+
+getLocalBounds :: Circle -> Rect Float
+export getLocalBounds = extern "madsfml__circle__getLocalBounds"
+
+getGlocalBounds :: Circle -> Rect Float
+export getGlocalBounds = extern "madsfml__circle__getGlocalBounds"
+
+
+// --------- Transform ------------------------------------
+
+getOrigin :: Circle -> Vector2 Float
+export getOrigin = extern "madsfml__circle__getOrigin"
+
 setOrigin :: Float -> Float -> Circle -> Circle
 export setOrigin = extern "madsfml__circle__setOrigin"
+
+getPosition :: Circle -> Vector2 Float
+export getPosition = extern "madsfml__circle__getPosition"
 
 setPosition :: Float -> Float -> Circle -> Circle
 export setPosition = extern "madsfml__circle__setPosition"
 
+getRotation :: Circle -> Float
+export getRotation = extern "madsfml__circle__getRotation"
+
 setRotation :: Float -> Circle -> Circle
 export setRotation = extern "madsfml__circle__setRotation"
+
+getScale :: Circle -> Vector2 Float
+export getScale = extern "madsfml__circle__getScale"
 
 setScale :: Float -> Float -> Circle -> Circle
 export setScale = extern "madsfml__circle__setScale"
 
+getPointCount :: Circle -> Short
+export getPointCount = extern "madsfml__circle__getPointCount"
+
 setPointCount :: Short -> Circle -> Circle
 export setPointCount = extern "madsfml__circle__setPointCount"
 
-setRadius :: Short -> Circle -> Circle
-export setRadius = extern "madsfml__circle__setRadius"
-
 getTransform :: Circle -> Transform
 export getTransform = extern "madsfml__circle__getTransform"
+
+
+
+// --------- Drawable -------------------------------------
 
 draw :: Circle -> Window -> {}
 export draw = extern "madsfml__circle__draw"

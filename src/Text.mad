@@ -1,10 +1,12 @@
-import Set from "Set"
-import Math from "Math"
 import type { Color } from "./Color"
 import type { Font } from "./Font"
-import type { Window } from "./Window"
-import type { Vector2, Rect } from "./Math"
+import type { Rect, Vector2 } from "./Math"
+import type { RenderStates } from "./RenderStates"
 import type { Transform } from "./Transform"
+import type { Window } from "./Window"
+
+import Math from "Math"
+import Set from "Set"
 
 import { colorToShort } from "./Color"
 
@@ -54,7 +56,7 @@ setString :: String -> Text -> Text
 export setString = extern "madsfml__text__setString"
 
 setFillColorFFI :: Short -> Text -> Text
-export setFillColorFFI = extern "madsfml__text__setFillColor"
+setFillColorFFI = extern "madsfml__text__setFillColor"
 
 setFillColor :: Color -> Text -> Text
 export setFillColor = (c, t) => pipe(
@@ -63,7 +65,7 @@ export setFillColor = (c, t) => pipe(
 )(c)
 
 setOutlineColorFFI :: Short -> Text -> Text
-export setOutlineColorFFI = extern "madsfml__text__setOutlineColor"
+setOutlineColorFFI = extern "madsfml__text__setOutlineColor"
 
 setOutlineColor :: Color -> Text -> Text
 export setOutlineColor = (c, t) => pipe(
@@ -89,7 +91,7 @@ setStylesFFI = extern "madsfml__text__setStyles"
 setStyles :: List Style -> Text -> Text
 export setStyles = (styles, text) => pipe(
   sumStyles,
-  setStylesFFI($, text)
+  setStylesFFI($, text),
 )(styles)
 
 getLocalBounds :: Text -> Rect Float
@@ -135,3 +137,6 @@ export getTransform = extern "madsfml__text__getTransform"
 
 draw :: Text -> Window -> {}
 export draw = extern "madsfml__text__draw"
+
+drawWithRenderStates :: Text -> RenderStates -> Window -> {}
+export drawWithRenderStates = extern "madsfml__circle__drawWithRenderStates"

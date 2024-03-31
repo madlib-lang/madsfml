@@ -1,15 +1,13 @@
 #include <SFML/Graphics.hpp>
 
-#include "gc.h"
 #include "./math.hpp"
+#include "gc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-sf::Text *madsfml__text__make() {
-  return new sf::Text();
-}
+sf::Text *madsfml__text__make() { return new sf::Text(); }
 
 sf::Text *madsfml__text__setFont(sf::Font *font, sf::Text *text) {
   text->setFont(*font);
@@ -57,10 +55,7 @@ sf::Text *madsfml__text__setStyles(int32_t styles, sf::Text *text) {
   return text;
 }
 
-void madsfml__text__draw(sf::Text *text, sf::RenderWindow *window) {
-  window->draw(*text);
-}
-
+void madsfml__text__draw(sf::Text *text, sf::RenderWindow *window) { window->draw(*text); }
 
 madsfml__math__vector2_t *madsfml__text__getOrigin(sf::Text *text) {
   return madsfml__math__toMadlibFloatVector2(text->getOrigin());
@@ -80,9 +75,7 @@ sf::Text *madsfml__text__setPosition(double x, double y, sf::Text *s) {
   return s;
 }
 
-double madsfml__text__getRotation(sf::Text *text) {
-  return text->getRotation();
-}
+double madsfml__text__getRotation(sf::Text *text) { return text->getRotation(); }
 
 sf::Text *madsfml__text__setRotation(double angle, sf::Text *s) {
   s->setRotation(angle);
@@ -104,6 +97,10 @@ madsfml__math__rect_t *madsfml__text__getLocalBounds(sf::Text *text) {
 
 madsfml__math__rect_t *madsfml__text__getGlobalBounds(sf::Text *text) {
   return madsfml__math__toMadlibFloatRect(text->getGlobalBounds());
+}
+
+void madsfml__circle__drawWithRenderStates(sf::Text *t, sf::RenderStates *rs, sf::RenderWindow *window) {
+  window->draw(*t, *rs);
 }
 
 #ifdef __cplusplus

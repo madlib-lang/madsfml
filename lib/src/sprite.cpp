@@ -18,14 +18,13 @@ madsfml__math__rect_t *madsfml__sprite__getTextureRect(sf::Sprite *sprite) {
   return madsfml__math__toMadlibIntRect(sprite->getTextureRect());
 }
 
-sf::Sprite *madsfml__sprite__setTextureRect(int32_t left, int32_t top, int32_t width, int32_t height, sf::Sprite *sprite) {
+sf::Sprite *madsfml__sprite__setTextureRect(int32_t left, int32_t top, int32_t width, int32_t height,
+                                            sf::Sprite *sprite) {
   sprite->setTextureRect(sf::IntRect(left, top, width, height));
   return sprite;
 }
 
-int32_t madsfml__sprite__getColor(sf::Sprite *sprite) {
-  return sprite->getColor().toInteger();
-}
+int32_t madsfml__sprite__getColor(sf::Sprite *sprite) { return sprite->getColor().toInteger(); }
 
 sf::Sprite *madsfml__sprite__setColor(int32_t color, sf::Sprite *sprite) {
   sprite->setColor(sf::Color(color));
@@ -50,9 +49,7 @@ sf::Sprite *madsfml__sprite__setPosition(double x, double y, sf::Sprite *s) {
   return s;
 }
 
-double madsfml__sprite__getRotation(sf::Sprite *sprite) {
-  return sprite->getRotation();
-}
+double madsfml__sprite__getRotation(sf::Sprite *sprite) { return sprite->getRotation(); }
 
 sf::Sprite *madsfml__sprite__setRotation(double angle, sf::Sprite *s) {
   s->setRotation(angle);
