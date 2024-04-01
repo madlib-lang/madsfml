@@ -1,0 +1,34 @@
+import { assertEquals, test } from "Test"
+
+import { Rect, Vector2, contains, intersects } from "./Math"
+
+
+
+test(
+  "intersects - true",
+  () => assertEquals(intersects(Rect(10, 10, 20, 20), Rect(20, 20, 20, 20)), true),
+)
+
+
+test(
+  "intersects - false",
+  () => assertEquals(intersects(Rect(10, 10, 20, 20), Rect(30, 30, 20, 20)), false),
+)
+
+
+test(
+  "intersects - over",
+  () => assertEquals(intersects(Rect(10, 10, 20, 20), Rect(10, 10, 20, 20)), true),
+)
+
+
+test(
+    "contains - true",
+    () => assertEquals(contains(Rect(10, 10, 20, 20), Vector2(20, 20)), true),
+  )
+
+
+test(
+    "contains - false",
+    () => assertEquals(contains(Rect(10, 10, 20, 20), Vector2(30, 30)), false),
+  )

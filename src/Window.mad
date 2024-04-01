@@ -1,5 +1,6 @@
 import type { Color } from "./Color"
 import type { View } from "./View"
+import type { Vector2 } from "./Math"
 
 import { colorToShort } from "./Color"
 
@@ -35,11 +36,25 @@ export clear = (color, window) => pipe(
 )(color)
 
 
+getView :: Window -> View
+export getView = extern "madsfml__window__getView"
+
+
 setView :: View -> Window -> Window
 export setView = extern "madsfml__window__setView"
+
 
 getDefaultView :: Window -> View
 export getDefaultView = extern "madsfml__window__getDefaultView"
 
+
 setFrameRateLimit :: Short -> Window -> Window
 export setFrameRateLimit = extern "madsfml__window__setFrameRateLimit"
+
+
+mapPixelToCoords :: Short -> Short -> View -> Window -> Vector2 Float
+export mapPixelToCoords = extern "madsfml__window__mapPixelToCoords"
+
+
+mapCoordsToPixel :: Float -> Float -> View -> Window -> Vector2 Short
+export mapCoordsToPixel = extern "madsfml__window__mapCoordsToPixel"

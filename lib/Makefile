@@ -11,6 +11,7 @@ OBJS :=\
   $(BUILDDIR)/font.o            \
   $(BUILDDIR)/madsfml.o         \
   $(BUILDDIR)/math.o            \
+  $(BUILDDIR)/rectangle.o       \
   $(BUILDDIR)/renderstates.o    \
   $(BUILDDIR)/shader.o          \
   $(BUILDDIR)/sprite.o          \

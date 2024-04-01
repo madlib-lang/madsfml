@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 
+#include "./math.hpp"
 #include "gc.h"
 
 #ifdef __cplusplus
@@ -27,6 +28,10 @@ sf::RenderWindow *madsfml__window__setFrameRateLimit(int32_t limit, sf::RenderWi
   return window;
 }
 
+sf::View *madsfml__window__getView(sf::RenderWindow *window) {
+  return (sf::View *)&window->getView();
+}
+
 sf::RenderWindow *madsfml__window__setView(sf::View *view,
                                            sf::RenderWindow *window) {
   window->setView(*view);
@@ -39,6 +44,14 @@ void madsfml__window__clear(int32_t color, sf::RenderWindow *window) {
 
 sf::View *madsfml__window__getDefaultView(sf::RenderWindow *window) {
   return (sf::View *)&window->getDefaultView();
+}
+
+madsfml__math__vector2_t *madsfml__window__mapPixelToCoords(int32_t x, int32_t y, sf::View *view, sf::RenderWindow *window) {
+  return madsfml__math__toMadlibFloatVector2(window->mapPixelToCoords(sf::Vector2i(x, y), *view));
+}
+
+madsfml__math__vector2_t *madsfml__window__mapCoordsToPixel(double x, double y, sf::View *view, sf::RenderWindow *window) {
+  return madsfml__math__toMadlibIntVector2(window->mapCoordsToPixel(sf::Vector2f(x, y), *view));
 }
 
 #ifdef __cplusplus

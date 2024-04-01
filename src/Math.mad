@@ -1,3 +1,44 @@
+import Math from "Math"
+
+
+
 export type Vector2 a = Vector2(a, a)
 
 export type Rect a = Rect(a, a, a, a)
+
+intersects :: (Number a, Comparable a) => Rect a -> Rect a -> Boolean
+export intersects = (r1, r2) => where(#[r1, r2]) {
+  #[Rect(x1, y1, w1, h1), Rect(x2, y2, w2, h2)] =>
+    do {
+      r1MinX = Math.min(x1, x1 + w1)
+      r1MaxX = Math.max(x1, x1 + w1)
+      r1MinY = Math.min(y1, y1 + h1)
+      r1MaxY = Math.max(y1, y1 + h1)
+
+      r2MinX = Math.min(x2, x2 + w2)
+      r2MaxX = Math.max(x2, x2 + w2)
+      r2MinY = Math.min(y2, y2 + h2)
+      r2MaxY = Math.max(y2, y2 + h2)
+
+      interLeft = Math.max(r1MinX, r2MinX)
+      interTop = Math.max(r1MinY, r2MinY)
+      interRight = Math.min(r1MaxX, r2MaxX)
+      interBottom = Math.min(r1MaxY, r2MaxY)
+
+      return interLeft < interRight && interTop < interBottom
+    }
+}
+
+
+contains :: (Comparable a, Number a) => Rect a -> Vector2 a -> Boolean
+export contains = (rect, point) => where(#[rect, point]) {
+  #[Rect(x, y, w, h), Vector2(vx, vy)] =>
+    do {
+        minX = Math.min(x, x + w)
+        maxX = Math.max(x, x + w)
+        minY = Math.min(y, y + h)
+        maxY = Math.max(y, y + h)
+
+        return vx >= minX && vx < maxX && vy >= minY && vy < maxY
+    }
+}
