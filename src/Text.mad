@@ -139,4 +139,4 @@ draw :: Text -> Window -> {}
 export draw = extern "madsfml__text__draw"
 
 drawWithRenderStates :: Text -> RenderStates -> Window -> {}
-export drawWithRenderStates = extern "madsfml__circle__drawWithRenderStates"
+export drawWithRenderStates = extern "madsfml__text__drawWithRenderStates"

@@ -7,6 +7,7 @@ INCLUDEDIR := include
 BUILDDIR := build
 SRCDIR := src
 OBJS :=\
+  $(BUILDDIR)/blendmode.o       \
   $(BUILDDIR)/circle.o          \
   $(BUILDDIR)/font.o            \
   $(BUILDDIR)/madsfml.o         \

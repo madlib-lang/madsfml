@@ -32,5 +32,32 @@ loadFromMemoryFFI = extern "madsfml__shader__loadFromMemory"
 loadFromMemory :: String -> Type -> Shader -> Boolean
 export loadFromMemory = (path, t, shader) => loadFromMemoryFFI(path, typeToSFMLType(t), shader)
 
-setCurrentTexture :: Shader -> {}
-export setCurrentTexture = extern "setCurrentTexture"
+setCurrentTexture :: String -> Shader -> Shader
+export setCurrentTexture = extern "madsfml__shader__setCurrentTexture"
+
+setIntUniform :: String -> Short -> Shader -> Shader
+export setIntUniform = extern "madsfml__shader__setIntUniform"
+
+setFloatUniform :: String -> Float -> Shader -> Shader
+export setFloatUniform = extern "madsfml__shader__setFloatUniform"
+
+setBoolUniform :: String -> Boolean -> Shader -> Shader
+export setBoolUniform = extern "madsfml__shader__setBoolUniform"
+
+setVec2Uniform :: String -> Float -> Float -> Shader -> Shader
+export setVec2Uniform = extern "madsfml__shader__setVec2Uniform"
+
+setVec3Uniform :: String -> Float -> Float -> Float -> Shader -> Shader
+export setVec3Uniform = extern "madsfml__shader__setVec3Uniform"
+
+setVec4Uniform :: String -> Float -> Float -> Float -> Float -> Shader -> Shader
+export setVec4Uniform = extern "madsfml__shader__setVec4Uniform"
+
+setIVec2Uniform :: String -> Short -> Short -> Shader -> Shader
+export setIVec2Uniform = extern "madsfml__shader__setIVec2Uniform"
+
+setIVec3Uniform :: String -> Short -> Short -> Short -> Shader -> Shader
+export setIVec3Uniform = extern "madsfml__shader__setIVec3Uniform"
+
+setIVec4Uniform :: String -> Short -> Short -> Short -> Short -> Shader -> Shader
+export setIVec4Uniform = extern "madsfml__shader__setIVec4Uniform"

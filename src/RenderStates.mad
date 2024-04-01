@@ -1,6 +1,7 @@
 import type { Shader } from "./Shader"
 import type { Texture } from "./Texture"
 import type { Transform } from "./Transform"
+import type { BlendMode } from "./BlendMode"
 
 
 
@@ -18,3 +19,6 @@ export setTexture = extern "madsfml__renderstates__setTexture"
 
 setShader :: Shader -> RenderStates -> RenderStates
 export setShader = extern "madsfml__renderstates__setShader"
+
+setBlendMode :: BlendMode -> RenderStates -> RenderStates
+export setBlendMode = extern "madsfml__renderstates__setBlendMode"

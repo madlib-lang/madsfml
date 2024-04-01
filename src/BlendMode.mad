@@ -1,0 +1,79 @@
+type BlendMode = __BlendMode__
+export type BlendMode
+
+
+export type Factor
+  = Zero
+  | One
+  | SrcColor
+  | OneMinusSrcColor
+  | DstColor
+  | OneMinusDstColor
+  | SrcAlpha
+  | OneMinusSrcAlpha
+  | DstAlpha
+  | OneMinusDstAlpha
+
+
+factorToShort :: Factor -> Short
+factorToShort = where {
+  Zero =>
+    0
+
+  One =>
+    1
+
+  SrcColor =>
+    2
+
+  OneMinusSrcColor =>
+    3
+
+  DstColor =>
+    4
+
+  OneMinusDstColor =>
+    5
+
+  SrcAlpha =>
+    6
+
+  OneMinusSrcAlpha =>
+    7
+
+  DstAlpha =>
+    8
+
+  OneMinusDstAlpha =>
+    9
+}
+
+export type Equation = Add | Subtract | ReverseSubtract | Min | Max
+
+equationToShort :: Equation -> Short
+equationToShort = where {
+  Add =>
+    0
+
+  Subtract =>
+    1
+
+  ReverseSubtract =>
+    2
+
+  Min =>
+    3
+
+  Max =>
+    4
+}
+
+makeFFI :: Short -> Short -> Short -> BlendMode
+export makeFFI = extern "madsfml__blendmode__make"
+
+make :: Factor -> Factor -> Equation -> BlendMode
+export make = (sourceFactor, destinationFactor, equation) => makeFFI(
+  factorToShort(sourceFactor),
+  factorToShort(destinationFactor),
+  equationToShort(equation),
+)

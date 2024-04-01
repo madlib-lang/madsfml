@@ -28,6 +28,12 @@ sf::RenderStates *madsfml__renderstates__setShader(sf::Shader *s,
   return rs;
 }
 
+sf::RenderStates *madsfml__renderstates__setBlendMode(sf::BlendMode *b,
+                                                   sf::RenderStates *rs) {
+  rs->blendMode = *b;
+  return rs;
+}
+
 #ifdef __cplusplus
 }
 #endif

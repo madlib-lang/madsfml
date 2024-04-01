@@ -99,7 +99,7 @@ madsfml__math__rect_t *madsfml__text__getGlobalBounds(sf::Text *text) {
   return madsfml__math__toMadlibFloatRect(text->getGlobalBounds());
 }
 
-void madsfml__circle__drawWithRenderStates(sf::Text *t, sf::RenderStates *rs, sf::RenderWindow *window) {
+void madsfml__text__drawWithRenderStates(sf::Text *t, sf::RenderStates *rs, sf::RenderWindow *window) {
   window->draw(*t, *rs);
 }
 
