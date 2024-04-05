@@ -2,6 +2,7 @@ node_modules
 madlib_modules
 .module_cache
 src/Test.mad
+src/Test2.mad
 build
 lib/include
 lib/lib
@@ -13,3 +14,6 @@ sprite.png
 arial.ttf
 .tests
 .repl
+lib/src/openglexample.cpp
+shader.vert
+shader.frag

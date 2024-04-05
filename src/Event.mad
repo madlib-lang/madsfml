@@ -18,7 +18,9 @@ alias SizeEventData = { height :: Short, width :: Short }
 
 alias TextEventData = { char :: Char }
 
-alias MouseMoveEventData = { x :: Short, y :: Short }
+export type Wheel = VerticalWheel | HorizontalWheel
+
+alias MouseWheelScrollEventData = { x :: Short, y :: Short, delta :: Float, wheel :: Wheel }
 
 alias MouseButtons = {
   Left :: Short,
@@ -59,8 +61,7 @@ export type Event
   | MouseEnterEvent
   | MouseLeaveEvent
   | MouseMoveEvent(MouseMoveEventData)
-  | MouseWheelMoveEvent(MouseMoveEventData)
-  | MouseWheelScrollEvent
+  | MouseWheelScrollEvent(MouseWheelScrollEventData)
   | SensorChangeEvent
   | SizeEvent(SizeEventData)
   | TextEnterEvent(TextEventData)

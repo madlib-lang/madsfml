@@ -1,4 +1,4 @@
 #!/bin/sh
 
 make -C lib -j
-LDFLAGS="-L/opt/homebrew/lib/ -lfreetype -framework AppKit -framework IOKit -framework Carbon -framework CoreGraphics -framework OpenAL -ObjC" madlib run -t llvm src/Test.mad
+LDFLAGS="-L/opt/homebrew/lib/ -framework OpenGL -lfreetype -framework AppKit -framework IOKit -framework Carbon -framework CoreGraphics -framework OpenAL -ObjC" madlib run -t llvm src/Test.mad
