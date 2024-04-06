@@ -1,3 +1,4 @@
+import Math from "../Math"
 import type { Rect, Vector2 } from "../Math"
 import type { Shader } from "../Shader"
 import type { VertexBuffer } from "../VertexBuffer"
@@ -5,17 +6,15 @@ import type { VertexBuffer } from "../VertexBuffer"
 import Array from "Array"
 import Short from "Short"
 
-import BlendMode from "../BlendMode"
-import Circle from "../Circle"
-import Math from "../Math"
 import PrimitiveType from "../PrimitiveType"
-import Rectangle from "../Rectangle"
-import RenderStates from "../RenderStates"
 import Shader from "../Shader"
 import Vertex from "../Vertex"
+import BlendMode from "../BlendMode"
 import VertexBuffer from "../VertexBuffer"
-import View from "../View"
+import RenderStates from "../RenderStates"
 import Window from "../Window"
+import View from "../View"
+import Rectangle from "../Rectangle"
 
 
 
@@ -35,47 +34,95 @@ void main() {
   vPosition = gl_Position.xy;
 }
 `
-
 F_SHADER_LIGHT = `
 varying vec2 vLightPosition;
 varying vec2 vPosition;
 
 void main() {
   vec2 v_uv = gl_TexCoord[0].xy;
-  vec4 u_color = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 u_color = vec4(0.0, 1.0, 1.0, 1.0);
   float distance = length(vLightPosition - vPosition);
   float constant = 1.0;
   float linear = 10.0;
   float quadratic = 7.5;
   float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
 
-  gl_FragColor = vec4(attenuation * u_color.rgb, 1.0);
+  gl_FragColor = attenuation * u_color;
 }
 `
 
 V_SHADER_SHADOW = `
-#extension GL_EXT_gpu_shader4 : require
+// #extension GL_EXT_gpu_shader4 : require
+// uniform vec2 uLightPosition;
+
+// void main() {
+//   vec2 vLightPosition = (gl_ModelViewProjectionMatrix * vec4(uLightPosition.xy, 0, 1)).xy * 1.0001;
+//   vec4 position = gl_ModelViewProjectionMatrix * gl_Vertex;
+//   gl_Position = position;
+
+//   if(gl_VertexID % 2 == 0) {
+//     gl_Position = vec4(position.xy - vLightPosition, position.z, 0.0);
+//   }
+// }
+attribute vec4 a_segment;
+attribute vec2 a_shadow_coord;
+
 uniform vec2 uLightPosition;
 
-void main() {
-  vec2 vLightPosition = (gl_ModelViewProjectionMatrix * vec4(uLightPosition.xy, 0, 1)).xy * 1.0001;
-  vec4 position = gl_ModelViewProjectionMatrix * gl_Vertex;
-  gl_Position = position;
+varying vec4 v_penumbras;
+varying vec3 v_edges;
+varying vec3 v_proj_pos;
+varying vec4 v_endpoints;
 
-  if(gl_VertexID % 2 == 0) {
-    gl_Position = vec4(position.xy - vLightPosition, position.z, 0.0);
-  }
+// Keep in mind this is GLSL code. You'll need to swap row/column for HLSL.
+mat2 adjugate(mat2 m){return mat2(m[1][1], -m[0][1], -m[1][0], m[0][0]);}
+
+void main(){
+  // Unpack the vertex shader input.
+  vec2 endpoint_a = (u_matrix*vec4(a_segment.zw, 0.0, 1.0)).xy;
+  vec2 endpoint_b = (u_matrix*vec4(a_segment.xy, 0.0, 1.0)).xy;
+  vec2 endpoint = mix(endpoint_a, endpoint_b, a_shadow_coord.x);
+  float light_radius = u_light.z;
+  
+  // Deltas from the segment to the light center.
+  vec2 delta_a = endpoint_a - u_light.xy;
+  vec2 delta_b = endpoint_b - u_light.xy;
+  vec2 delta = endpoint - u_light.xy;
+  
+  // Offsets from the light center to the edge of the light volume.
+  vec2 offset_a = vec2(-light_radius,  light_radius)*normalize(delta_a).yx;
+  vec2 offset_b = vec2( light_radius, -light_radius)*normalize(delta_b).yx;
+  vec2 offset = mix(offset_a, offset_b, a_shadow_coord.x);
+  
+  // Vertex projection.
+  float w = a_shadow_coord.y;
+  vec3 proj_pos = vec3(mix(delta - offset, endpoint, w), w);
+  gl_Position = vec4(proj_pos.xy, 0, w);
+  gl_Position.x *= 0.75; // I'm too lazy to use a projection matrix here...
+  
+  vec2 penumbra_a = adjugate(mat2( offset_a, -delta_a))*(delta - mix(offset, delta_a, w));
+  vec2 penumbra_b = adjugate(mat2(-offset_b,  delta_b))*(delta - mix(offset, delta_b, w));
+  v_penumbras = (light_radius > 0.0 ? vec4(penumbra_a, penumbra_b) : vec4(0, 1, 0, 1));
+
+  // Edge values for light penetration and clipping.
+  vec2 seg_delta = endpoint_b - endpoint_a;
+  vec2 seg_normal = seg_delta.yx*vec2(-1.0, 1.0);
+  // Calculate where the light -> pixel ray will intersect with the segment.
+  v_edges.xy = -adjugate(mat2(seg_delta, delta_a + delta_b))*(delta - offset*(1.0 - w));
+  v_edges.y *= 2.0; // Skip a multiply in the fragment shader.
+  // Calculate a clipping coordinate that is 0 at the near edge (when w = 1)...
+  // otherwise calculate the dot product with the projected coordinate.
+  v_edges.z = dot(seg_normal, delta - offset)*(1.0 - w);
+
+  // Light penetration values.
+  float light_penetration = 0.01;
+  v_proj_pos = vec3(proj_pos.xy, w*light_penetration);
+  v_endpoints = vec4(endpoint_a, endpoint_b)/light_penetration;
 }
 `
-
-F_SHADER_SHADOW = `
-uniform float uResolution;
-
-void main() {
-  float alphaStep = 1.0 / uResolution;
-  gl_FragColor = vec4(0.0, 0.0, 0.0, alphaStep);
-}
-`
+F_SHADER_SHADOW = `void main() {
+  gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+}`
 
 
 alias LightManagerData = { lightShader :: Shader, shadowShader :: Shader }
@@ -105,31 +152,8 @@ export makeLightManager = () => {
 }
 
 
-LIGHT_BLENDING_MODE = BlendMode.makeWithAlpha(
-  BlendMode.DstAlpha,
-  BlendMode.One,
-  BlendMode.Add,
-  BlendMode.One,
-  BlendMode.Zero,
-  BlendMode.Add,
-)
-SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(
-  BlendMode.Zero,
-  BlendMode.One,
-  BlendMode.Add,
-  BlendMode.Zero,
-  BlendMode.Zero,
-  BlendMode.Add,
-)
-
-_SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(
-  BlendMode.Zero,
-  BlendMode.One,
-  BlendMode.Add,
-  BlendMode.One,
-  BlendMode.One,
-  BlendMode.ReverseSubtract,
-)
+LIGHT_BLENDING_MODE = BlendMode.makeWithAlpha(BlendMode.DstAlpha, BlendMode.One, BlendMode.Add, BlendMode.One, BlendMode.Zero, BlendMode.Add)
+SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(BlendMode.Zero, BlendMode.One, BlendMode.Add, BlendMode.Zero, BlendMode.Zero, BlendMode.Add)
 
 
 setPosition :: Float -> Float -> Light -> Light
@@ -141,7 +165,6 @@ export setPosition = (x, y, light) => where(light) {
     }
 }
 
-
 draw :: LightManager -> Light -> Window -> {}
 export draw = (manager, light, window) => {
   rect = pipe(
@@ -150,7 +173,7 @@ export draw = (manager, light, window) => {
     where {
       Math.Vector2(w, h) =>
         Rectangle.make(w, h)
-    },
+    }
   )(window)
 
   shaders = where(manager) {
@@ -170,48 +193,12 @@ export draw = (manager, light, window) => {
   shadowRenderStates = RenderStates.default()
   RenderStates.setShader(shaders.shadowShader, shadowRenderStates)
   RenderStates.setBlendMode(SHADOW_BLENDING_MODE, shadowRenderStates)
-  _shadowRenderStates = RenderStates.default()
-  RenderStates.setShader(shaders.shadowShader, _shadowRenderStates)
-  RenderStates.setBlendMode(_SHADOW_BLENDING_MODE, _shadowRenderStates)
-
-  resolution = 30
-  radius = 20
-  c = Circle.make(radius)
-  Circle.setPointCount(resolution, c)
 
   where(lightData.position) {
     Math.Vector2(x, y) =>
       do {
-        i = 0
-        Shader.setFloatUniform("uResolution", Short.toFloat(resolution + 1), shaders.shadowShader)
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.shadowShader)
-        VertexBuffer.drawWithRenderStates(lightData.castersBuffer, _shadowRenderStates, window)
-
-        while(i < resolution) do {
-          where(Circle.getPoint(i, c)) {
-            Math.Vector2(_x, _y) =>
-              do {
-                Shader.setFloatUniform(
-                  "uResolution",
-                  Short.toFloat(resolution + 1),
-                  shaders.shadowShader,
-                )
-                Shader.setVec2Uniform(
-                  "uLightPosition",
-                  x + _x - radius,
-                  y + _y - radius,
-                  shaders.shadowShader,
-                )
-                VertexBuffer.drawWithRenderStates(
-                  lightData.castersBuffer,
-                  _shadowRenderStates,
-                  window,
-                )
-              }
-          }
-          i := i + 1
-        }
-
+        VertexBuffer.drawWithRenderStates(lightData.castersBuffer, shadowRenderStates, window)
 
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.lightShader)
         Rectangle.drawWithRenderStates(rect, lightRenderStates, window)

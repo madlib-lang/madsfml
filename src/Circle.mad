@@ -83,6 +83,9 @@ export getPointCount = extern "madsfml__circle__getPointCount"
 setPointCount :: Short -> Circle -> Circle
 export setPointCount = extern "madsfml__circle__setPointCount"
 
+getPoint :: Short -> Circle -> Vector2 Float
+export getPoint = extern "madsfml__circle__getPoint"
+
 getTransform :: Circle -> Transform
 export getTransform = extern "madsfml__circle__getTransform"
 

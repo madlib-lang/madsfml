@@ -88,6 +88,10 @@ sf::CircleShape *madsfml__circle__setPointCount(int32_t points, sf::CircleShape 
   return c;
 }
 
+madsfml__math__vector2_t *madsfml__circle__getPoint(int32_t index, sf::CircleShape *circle) {
+  return madsfml__math__toMadlibFloatVector2(circle->getPoint(index));
+}
+
 double madsfml__circle__getRadius(double radius, sf::CircleShape *c) {
   c->getRadius();
 }
