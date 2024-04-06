@@ -14,8 +14,8 @@ create :: Short -> Short -> String -> Window
 export create = extern "madsfml__window__create"
 
 
-createWithSettings :: Short -> Short -> String -> Short -> Window
-export createWithSettings = extern "madsfml__window__createWithSettings"
+createWithAntialiasing :: Short -> Short -> String -> Short -> Window
+export createWithAntialiasing = extern "madsfml__window__createWithAntialiasing"
 
 
 close :: Window -> {}

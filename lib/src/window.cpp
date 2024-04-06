@@ -9,7 +9,6 @@ extern "C" {
 
 sf::RenderWindow *madsfml__window__create(int32_t w, int32_t h, char *name) {
   sf::ContextSettings contextSettings;
-  contextSettings.antialiasingLevel = 8;
   contextSettings.depthBits = 24;
   contextSettings.sRgbCapable = false;
 
@@ -17,10 +16,11 @@ sf::RenderWindow *madsfml__window__create(int32_t w, int32_t h, char *name) {
   return new sf::RenderWindow(sf::VideoMode(w, h), name, sf::Style::Default, contextSettings);
 }
 
-sf::RenderWindow *madsfml__window__createWithSettings(int32_t w, int32_t h, char *name, int32_t antialiasingLevel) {
-  sf::ContextSettings settings;
-  settings.antialiasingLevel = antialiasingLevel;
-  return new sf::RenderWindow(sf::VideoMode(w, h), std::string(name), sf::Style::Default, settings);
+sf::RenderWindow *madsfml__window__createWithAntialiasing(int32_t w, int32_t h, char *name, int32_t antialiasingLevel) {
+  sf::ContextSettings contextSettings;
+  contextSettings.depthBits = 24;
+  contextSettings.antialiasingLevel = antialiasingLevel;
+  return new sf::RenderWindow(sf::VideoMode(w, h), std::string(name), sf::Style::Default, contextSettings);
 }
 
 void madsfml__window__close(sf::RenderWindow *window) { window->close(); }
