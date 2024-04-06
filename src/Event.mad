@@ -20,23 +20,18 @@ alias TextEventData = { char :: Char }
 
 export type Wheel = VerticalWheel | HorizontalWheel
 
-alias MouseWheelScrollEventData = { x :: Short, y :: Short, delta :: Float, wheel :: Wheel }
+alias MouseWheelScrollEventData = { delta :: Float, wheel :: Wheel, x :: Short, y :: Short }
 
-alias MouseButtons = {
-  Left :: Short,
-  Middle :: Short,
-  Right :: Short,
-  XButton1 :: Short,
-  XButton2 :: Short,
-}
+export type MouseButton = Left | Right | Middle | XButton1 | XButton2
 
 
-MouseButton :: MouseButtons
-export MouseButton = { Left: 0, Right: 1, Middle: 2, XButton1: 3, XButton2: 4 }
+export type JoystickAxis = PovX | PovY | R | U | V | X | Y | Z
 
-alias MouseButtonEventData = { button :: Short, x :: Short, y :: Short }
+alias MouseButtonEventData = { button :: MouseButton, x :: Short, y :: Short }
 
 alias MouseMoveEventData = { x :: Short, y :: Short }
+
+alias JoystickMoveEventData = { axis :: JoystickAxis, joystickId :: Short, position :: Float }
 
 alias JoystickButtonEventData = { button :: Short, joystickId :: Short }
 
@@ -53,7 +48,7 @@ export type Event
   | JoystickButtonReleaseEvent(JoystickButtonEventData)
   | JoystickConnectEvent(JoystickConnectEventData)
   | JoystickDisconnectEvent(JoystickConnectEventData)
-  | JoystickMoveEvent
+  | JoystickMoveEvent(JoystickMoveEventData)
   | KeyPressedEvent(KeyEventData)
   | KeyReleasedEvent(KeyEventData)
   | MouseButtonPressEvent(MouseButtonEventData)

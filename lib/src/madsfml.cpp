@@ -39,6 +39,33 @@ enum madsfml__WheelType {
   VerticalWheel,
 };
 
+enum madsfml__MouseButtonIndex {
+  Left,
+  Middle,
+  Right,
+  XButton1,
+  XButton2,
+};
+
+typedef struct madsfml__MouseButton {
+  int64_t index;
+} madsfml__MouseButton_t;
+
+enum madsfml__JoystickAxisIndex {
+  PovX,
+  PovY,
+  R,
+  U,
+  V,
+  X,
+  Y,
+  Z,
+};
+
+typedef struct madsfml__JoystickAxis {
+  int64_t index;
+} madsfml__JoystickAxis_t;
+
 typedef struct madsfml__Wheel {
   int64_t index;
 } madsfml__Wheel_t;
@@ -113,6 +140,7 @@ madlib__maybe__Maybe_t *madsfml__pollEvent(sf::RenderWindow *window) {
       break;
     }
 
+    case sf::Event::EventType::MouseButtonReleased:
     case sf::Event::EventType::MouseButtonPressed: {
       madlib__record__Record_t *eventData =
           (madlib__record__Record_t *)GC_MALLOC(
@@ -123,7 +151,30 @@ madlib__maybe__Maybe_t *madsfml__pollEvent(sf::RenderWindow *window) {
       eventData->fields[0] =
           (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
       eventData->fields[0]->name = (char *)"button";
-      eventData->fields[0]->value = (void *)sfmlEvent.mouseButton.button;
+      madsfml__MouseButton_t *mouseButton = (madsfml__MouseButton_t*) GC_MALLOC(sizeof(madsfml__MouseButton_t));
+      eventData->fields[0]->value = (void *)mouseButton;
+      switch(sfmlEvent.joystickMove.axis) {
+        case sf::Mouse::Button::Left: {
+          mouseButton->index = madsfml__MouseButtonIndex::Left;
+          break;
+        }
+        case sf::Mouse::Button::Right: {
+          mouseButton->index = madsfml__MouseButtonIndex::Right;
+          break;
+        }
+        case sf::Mouse::Button::Middle: {
+          mouseButton->index = madsfml__MouseButtonIndex::Middle;
+          break;
+        }
+        case sf::Mouse::Button::XButton1: {
+          mouseButton->index = madsfml__MouseButtonIndex::XButton1;
+          break;
+        }
+        case sf::Mouse::Button::XButton2: {
+          mouseButton->index = madsfml__MouseButtonIndex::XButton2;
+          break;
+        }
+      }
       eventData->fields[1] =
           (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
       eventData->fields[1]->name = (char *)"x";
@@ -135,37 +186,7 @@ madlib__maybe__Maybe_t *madsfml__pollEvent(sf::RenderWindow *window) {
 
       madsfml__Event_t *event =
           (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
-      event->index = madsfml__EventType::MouseButtonPress;
-      event->data = (void *)eventData;
-
-      result->index = madlib__maybe__Maybe_JUST_INDEX;
-      result->data = event;
-      break;
-    }
-
-    case sf::Event::EventType::MouseButtonReleased: {
-      madlib__record__Record_t *eventData =
-          (madlib__record__Record_t *)GC_MALLOC(
-              sizeof(madlib__record__Record_t));
-      eventData->fieldCount = 3;
-      eventData->fields = (madlib__record__Field_t **)GC_MALLOC(
-          sizeof(madlib__record__Field_t *) * 3);
-      eventData->fields[0] =
-          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
-      eventData->fields[0]->name = (char *)"button";
-      eventData->fields[0]->value = (void *)sfmlEvent.mouseButton.button;
-      eventData->fields[1] =
-          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
-      eventData->fields[1]->name = (char *)"x";
-      eventData->fields[1]->value = (void *)sfmlEvent.mouseButton.x;
-      eventData->fields[2] =
-          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
-      eventData->fields[2]->name = (char *)"y";
-      eventData->fields[2]->value = (void *)sfmlEvent.mouseButton.y;
-
-      madsfml__Event_t *event =
-          (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
-      event->index = madsfml__EventType::MouseButtonRelease;
+      event->index = sfmlEvent.type == sf::Event::EventType::MouseButtonPressed ? madsfml__EventType::MouseButtonPress : madsfml__EventType::MouseButtonRelease;
       event->data = (void *)eventData;
 
       result->index = madlib__maybe__Maybe_JUST_INDEX;
@@ -293,6 +314,149 @@ madlib__maybe__Maybe_t *madsfml__pollEvent(sf::RenderWindow *window) {
 
       result->index = madlib__maybe__Maybe_JUST_INDEX;
       result->data = (void*) event;
+      break;
+    }
+
+    case sf::Event::EventType::JoystickButtonReleased:
+    case sf::Event::EventType::JoystickButtonPressed: {
+      madlib__record__Record_t *eventData =
+          (madlib__record__Record_t *)GC_MALLOC(
+              sizeof(madlib__record__Record_t));
+      eventData->fieldCount = 2;
+      eventData->fields = (madlib__record__Field_t **)GC_MALLOC(
+          sizeof(madlib__record__Field_t *) * 2);
+      eventData->fields[0] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[0]->name = (char *)"button";
+      eventData->fields[0]->value = (void *)sfmlEvent.joystickButton.button;
+      eventData->fields[1] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[1]->name = (char *)"joystickId";
+      eventData->fields[1]->value = (void *)sfmlEvent.joystickButton.joystickId;
+      madsfml__Event_t *event =
+          (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
+      event->index = sfmlEvent.type == sf::Event::EventType::JoystickButtonPressed ? madsfml__EventType::JoystickButtonPress : madsfml__EventType::JoystickButtonRelease;
+      event->data = (void *)eventData;
+
+      result->index = madlib__maybe__Maybe_JUST_INDEX;
+      result->data = event;
+      break;
+    }
+
+    case sf::Event::EventType::JoystickMoved: {
+      madlib__record__Record_t *eventData =
+          (madlib__record__Record_t *)GC_MALLOC(
+              sizeof(madlib__record__Record_t));
+      eventData->fieldCount = 3;
+      eventData->fields = (madlib__record__Field_t **)GC_MALLOC(
+          sizeof(madlib__record__Field_t *) * 3);
+      eventData->fields[0] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[0]->name = (char *)"axis";
+      madsfml__JoystickAxis_t *joystickAxis = (madsfml__JoystickAxis_t*) GC_MALLOC(sizeof(madsfml__JoystickAxis_t));
+      eventData->fields[0]->value = (void *)joystickAxis;
+      switch(sfmlEvent.joystickMove.axis) {
+        case sf::Joystick::Axis::PovX: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::PovX;
+          break;
+        }
+        case sf::Joystick::Axis::PovY: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::PovY;
+          break;
+        }
+        case sf::Joystick::Axis::R: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::R;
+          break;
+        }
+        case sf::Joystick::Axis::U: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::U;
+          break;
+        }
+        case sf::Joystick::Axis::V: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::V;
+          break;
+        }
+        case sf::Joystick::Axis::X: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::X;
+          break;
+        }
+        case sf::Joystick::Axis::Y: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::Y;
+          break;
+        }
+        case sf::Joystick::Axis::Z: {
+          joystickAxis->index = madsfml__JoystickAxisIndex::Z;
+          break;
+        }
+      }
+      eventData->fields[1] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[1]->name = (char *)"joystickId";
+      eventData->fields[1]->value = (void *)sfmlEvent.joystickMove.joystickId;
+      eventData->fields[2] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[2]->name = (char *)"position";
+      eventData->fields[2]->value = (void *)boxDouble(sfmlEvent.joystickMove.position);
+      madsfml__Event_t *event =
+          (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
+      event->index = madsfml__EventType::JoystickMove;
+      event->data = (void *)eventData;
+
+      result->index = madlib__maybe__Maybe_JUST_INDEX;
+      result->data = event;
+      break;
+    }
+
+    case sf::Event::EventType::JoystickDisconnected:
+    case sf::Event::EventType::JoystickConnected: {
+      madlib__record__Record_t *eventData =
+          (madlib__record__Record_t *)GC_MALLOC(
+              sizeof(madlib__record__Record_t));
+      eventData->fieldCount = 1;
+      eventData->fields = (madlib__record__Field_t **)GC_MALLOC(
+          sizeof(madlib__record__Field_t *) * 1);
+      eventData->fields[0] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[0]->name = (char *)"joystickId";
+      eventData->fields[0]->value = (void *)sfmlEvent.joystickMove.joystickId;
+      madsfml__Event_t *event =
+          (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
+      event->index = sfmlEvent.type == sf::Event::EventType::JoystickConnected ? madsfml__EventType::JoystickConnect : madsfml__EventType::JoystickDisconnect;
+      event->data = (void *)eventData;
+
+      result->index = madlib__maybe__Maybe_JUST_INDEX;
+      result->data = event;
+      break;
+    }
+
+    case sf::Event::EventType::TouchBegan:
+    case sf::Event::EventType::TouchMoved:
+    case sf::Event::EventType::TouchEnded: {
+      madlib__record__Record_t *eventData =
+          (madlib__record__Record_t *)GC_MALLOC(
+              sizeof(madlib__record__Record_t));
+      eventData->fieldCount = 3;
+      eventData->fields = (madlib__record__Field_t **)GC_MALLOC(
+          sizeof(madlib__record__Field_t *) * 3);
+      eventData->fields[0] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[0]->name = (char *)"finger";
+      eventData->fields[0]->value = (void *)sfmlEvent.touch.finger;
+      eventData->fields[1] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[1]->name = (char *)"x";
+      eventData->fields[1]->value = (void *)sfmlEvent.touch.x;
+      eventData->fields[2] =
+          (madlib__record__Field_t *)GC_MALLOC(sizeof(madlib__record__Field_t));
+      eventData->fields[2]->name = (char *)"y";
+      eventData->fields[2]->value = (void *)sfmlEvent.touch.y;
+      madsfml__Event_t *event =
+          (madsfml__Event_t *)GC_MALLOC(sizeof(madsfml__Event_t));
+      event->index = sfmlEvent.type == sf::Event::EventType::TouchBegan ? madsfml__EventType::TouchStart : sf::Event::EventType::TouchMoved ? madsfml__EventType::TouchMove : madsfml__EventType::TouchEnd;
+      event->data = (void *)eventData;
+
+      result->index = madlib__maybe__Maybe_JUST_INDEX;
+      result->data = event;
       break;
     }
 
