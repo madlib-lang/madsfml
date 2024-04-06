@@ -77,3 +77,24 @@ export make = (sourceFactor, destinationFactor, equation) => makeFFI(
   factorToShort(destinationFactor),
   equationToShort(equation),
 )
+
+makeWithAlphaFFI :: Short -> Short -> Short -> Short -> Short -> Short -> BlendMode
+export makeWithAlphaFFI = extern "madsfml__blendmode__makeWithAlpha"
+
+
+makeWithAlpha :: Factor -> Factor -> Equation -> Factor -> Factor -> Equation -> BlendMode
+export makeWithAlpha = (
+  sourceColorFactor,
+  destinationColorFactor,
+  colorEquation,
+  sourceAlphaFactor,
+  destinationAlphaFactor,
+  alphaEquation
+) => makeWithAlphaFFI(
+  factorToShort(sourceColorFactor),
+  factorToShort(destinationColorFactor),
+  equationToShort(colorEquation),
+  factorToShort(sourceAlphaFactor),
+  factorToShort(destinationAlphaFactor),
+  equationToShort(alphaEquation),
+)

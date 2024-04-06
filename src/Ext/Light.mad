@@ -1,0 +1,188 @@
+import Math from "../Math"
+import type { Rect, Vector2 } from "../Math"
+import type { Shader } from "../Shader"
+import type { VertexBuffer } from "../VertexBuffer"
+
+import Array from "Array"
+import Short from "Short"
+
+import PrimitiveType from "../PrimitiveType"
+import Shader from "../Shader"
+import Vertex from "../Vertex"
+import BlendMode from "../BlendMode"
+import VertexBuffer from "../VertexBuffer"
+import RenderStates from "../RenderStates"
+import Window from "../Window"
+import View from "../View"
+import Rectangle from "../Rectangle"
+
+
+
+V_SHADER_LIGHT = `
+varying vec2 v_uv;
+varying vec2 vLightPosition;
+uniform vec2 uLightPosition;
+varying vec2 vPosition;
+
+uniform mat4 u_matrix;
+
+void main() {
+  vLightPosition = (gl_ModelViewProjectionMatrix * vec4(uLightPosition.xy, 0, 1)).xy;
+
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+  vPosition = gl_Position.xy;
+}
+`
+F_SHADER_LIGHT = `
+varying vec2 vLightPosition;
+varying vec2 vPosition;
+
+void main() {
+  vec2 v_uv = gl_TexCoord[0].xy;
+  vec4 u_color = vec4(0.0, 1.0, 1.0, 1.0);
+  float distance = length(vLightPosition - vPosition);
+  float constant = 1.0;
+  float linear = 10.0;
+  float quadratic = 7.5;
+  float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
+
+  gl_FragColor = attenuation * u_color;
+}
+`
+
+V_SHADER_SHADOW = `
+#extension GL_EXT_gpu_shader4 : require
+uniform vec2 uLightPosition;
+
+void main() {
+  vec2 vLightPosition = (gl_ModelViewProjectionMatrix * vec4(uLightPosition.xy, 0, 1)).xy * 1.0001;
+  vec4 position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  gl_Position = position;
+
+  if(gl_VertexID % 2 == 0) {
+    gl_Position = vec4(position.xy - vLightPosition, position.z, 0.0);
+  }
+}
+`
+F_SHADER_SHADOW = `void main() { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); }`
+
+
+alias LightManagerData = { lightShader :: Shader, shadowShader :: Shader }
+
+type LightManager = LightManager(LightManagerData)
+export type LightManager
+
+alias LightData = {
+  casterPositions :: Array Vertex,
+  castersBuffer :: VertexBuffer,
+  position :: Vector2 Float,
+}
+
+type Light = Light(LightData)
+export type Light
+
+
+makeLightManager :: {} -> LightManager
+export makeLightManager = () => {
+  lightShader = Shader.new()
+  Shader.loadVertexAndFragmentShaderFromMemory(V_SHADER_LIGHT, F_SHADER_LIGHT, lightShader)
+
+  shadowShader = Shader.new()
+  Shader.loadVertexAndFragmentShaderFromMemory(V_SHADER_SHADOW, F_SHADER_SHADOW, shadowShader)
+
+  return LightManager({ lightShader, shadowShader })
+}
+
+
+LIGHT_BLENDING_MODE = BlendMode.makeWithAlpha(BlendMode.DstAlpha, BlendMode.One, BlendMode.Add, BlendMode.One, BlendMode.Zero, BlendMode.Add)
+SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(BlendMode.Zero, BlendMode.One, BlendMode.Add, BlendMode.Zero, BlendMode.Zero, BlendMode.Add)
+
+
+setPosition :: Float -> Float -> Light -> Light
+export setPosition = (x, y, light) => where(light) {
+  Light(data) =>
+    do {
+      data.position := Math.Vector2(x, y)
+      return light
+    }
+}
+
+draw :: LightManager -> Light -> Window -> {}
+export draw = (manager, light, window) => {
+  rect = pipe(
+    Window.getView,
+    View.getSize,
+    where {
+      Math.Vector2(w, h) =>
+        Rectangle.make(w, h)
+    }
+  )(window)
+
+  shaders = where(manager) {
+    LightManager(_shaders) =>
+      _shaders
+  }
+
+  lightData = where(light) {
+    Light(_lightData) =>
+      _lightData
+  }
+
+  lightRenderStates = RenderStates.default()
+  RenderStates.setShader(shaders.lightShader, lightRenderStates)
+  RenderStates.setBlendMode(LIGHT_BLENDING_MODE, lightRenderStates)
+
+  shadowRenderStates = RenderStates.default()
+  RenderStates.setShader(shaders.shadowShader, shadowRenderStates)
+  RenderStates.setBlendMode(SHADOW_BLENDING_MODE, shadowRenderStates)
+
+  where(lightData.position) {
+    Math.Vector2(x, y) =>
+      do {
+        Shader.setVec2Uniform("uLightPosition", x, y, shaders.lightShader)
+        Shader.setVec2Uniform("uLightPosition", x, y, shaders.shadowShader)
+      }
+  }
+
+  VertexBuffer.drawWithRenderStates(lightData.castersBuffer, shadowRenderStates, window)
+  Rectangle.drawWithRenderStates(rect, lightRenderStates, window)
+}
+
+make :: Vector2 Float -> Array Vertex -> Light
+export make = (position, casterPositions) => {
+  castersBuffer = VertexBuffer.makeWithPrimitiveType(PrimitiveType.TriangleStrip)
+  VertexBuffer.allocate(Short.fromInteger(Array.length(casterPositions)), castersBuffer)
+  VertexBuffer.update(casterPositions, castersBuffer)
+
+  return Light({ position, casterPositions, castersBuffer })
+}
+
+addRectCaster :: Rect Float -> Light -> Light
+export addRectCaster = (rect, light) => {
+  newVertices = where(rect) {
+    Math.Rect(x, y, w, h) =>
+      Array.fromList([
+        Vertex.fromPosition(x, y),
+        Vertex.fromPosition(x, y),
+        Vertex.fromPosition(x, y + h),
+        Vertex.fromPosition(x, y + h),
+        Vertex.fromPosition(x + w, y + h),
+        Vertex.fromPosition(x + w, y + h),
+        Vertex.fromPosition(x + w, y),
+        Vertex.fromPosition(x + w, y),
+        Vertex.fromPosition(x, y),
+        Vertex.fromPosition(x, y),
+      ])
+  }
+
+  where(light) {
+    Light({ casterPositions, castersBuffer }) =>
+      do {
+        Array.weld(casterPositions, newVertices)
+        VertexBuffer.update(casterPositions, castersBuffer)
+      }
+  }
+
+  return light
+}

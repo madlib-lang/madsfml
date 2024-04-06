@@ -26,11 +26,17 @@ loadFromFileFFI = extern "madsfml__shader__loadFromFile"
 loadFromFile :: String -> Type -> Shader -> Boolean
 export loadFromFile = (path, t, shader) => loadFromFileFFI(path, typeToSFMLType(t), shader)
 
+loadVertexAndFragmentShaderFromFile :: String -> String -> Shader -> Boolean
+export loadVertexAndFragmentShaderFromFile = extern "madsfml__shader__loadVertexAndFragmentShaderFromFile"
+
 loadFromMemoryFFI :: String -> Short -> Shader -> Boolean
 loadFromMemoryFFI = extern "madsfml__shader__loadFromMemory"
 
 loadFromMemory :: String -> Type -> Shader -> Boolean
 export loadFromMemory = (path, t, shader) => loadFromMemoryFFI(path, typeToSFMLType(t), shader)
+
+loadVertexAndFragmentShaderFromMemory :: String -> String -> Shader -> Boolean
+export loadVertexAndFragmentShaderFromMemory = extern "madsfml__shader__loadVertexAndFragmentShaderFromMemory"
 
 setCurrentTexture :: String -> Shader -> Shader
 export setCurrentTexture = extern "madsfml__shader__setCurrentTexture"

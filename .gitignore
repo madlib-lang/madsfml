@@ -3,6 +3,7 @@ madlib_modules
 .module_cache
 src/Test.mad
 src/Test2.mad
+src/Test3.mad
 build
 lib/include
 lib/lib

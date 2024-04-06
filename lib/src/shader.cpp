@@ -12,8 +12,16 @@ bool madsfml__shader__loadFromFile(char *path, sf::Shader::Type type, sf::Shader
   return shader->loadFromFile(path, type);
 }
 
+bool madsfml__shader__loadVertexAndFragmentShaderFromFile(char *vertexShaderPath, char *fragmentShaderPath, sf::Shader *shader) {
+  return shader->loadFromFile(vertexShaderPath, fragmentShaderPath);
+}
+
 bool madsfml__shader__loadFromMemory(char *code, sf::Shader::Type type, sf::Shader *shader) {
   return shader->loadFromMemory(code, type);
+}
+
+bool madsfml__shader__loadVertexAndFragmentShaderFromMemory(char *vertexCode, char *fragmentCode, sf::Shader *shader) {
+  return shader->loadFromMemory(vertexCode, fragmentCode);
 }
 
 sf::Shader *madsfml__shader__setCurrentTexture(char *name, sf::Shader *shader) {
