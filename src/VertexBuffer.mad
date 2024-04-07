@@ -1,5 +1,6 @@
 import type { PrimitiveType } from "./PrimitiveType"
 import type { RenderStates } from "./RenderStates"
+import type { RenderTexture } from "./RenderTexture"
 import type { Vertex } from "./Vertex"
 import type { Window } from "./Window"
 
@@ -45,3 +46,6 @@ export draw = extern "madsfml__vertexbuffer__draw"
 
 drawWithRenderStates :: VertexBuffer -> RenderStates -> Window -> {}
 export drawWithRenderStates = extern "madsfml__vertexbuffer__drawWithRenderStates"
+
+drawToTextureWithRenderStates :: VertexBuffer -> RenderStates -> RenderTexture -> {}
+export drawToTextureWithRenderStates = extern "madsfml__vertexbuffer__drawToTextureWithRenderStates"

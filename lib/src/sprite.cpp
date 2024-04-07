@@ -73,6 +73,10 @@ void madsfml__sprite__drawWithRenderStates(sf::Sprite *sprite, sf::RenderStates 
   window->draw(*sprite, *rs);
 }
 
+void madsfml__sprite__drawToTextureWithRenderStates(sf::Sprite *sprite, sf::RenderStates *rs, sf::RenderTexture *renderTexture) {
+  renderTexture->draw(*sprite, *rs);
+}
+
 void madsfml__sprite__drawWithShader(sf::Sprite *sprite, sf::Shader *shader, sf::RenderWindow *window) {
   window->draw(*sprite, shader);
 }

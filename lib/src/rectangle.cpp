@@ -13,6 +13,10 @@ void madsfml__rectangle__drawWithRenderStates(sf::RectangleShape *d, sf::RenderS
   window->draw(*d, *rs);
 }
 
+void madsfml__rectangle__drawToTextureWithRenderStates(sf::RectangleShape *d, sf::RenderStates *rs, sf::RenderTexture *renderTexture) {
+  renderTexture->draw(*d, *rs);
+}
+
 int32_t madsfml__rectangle__getFillColor(sf::RectangleShape *rectangle) {
   return rectangle->getFillColor().toInteger();
 }

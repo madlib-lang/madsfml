@@ -1,0 +1,61 @@
+import type { Color } from "./Color"
+import type { View } from "./View"
+import type { Vector2 } from "./Math"
+import type { Texture } from "./Texture"
+
+import { colorToShort } from "./Color"
+
+
+
+type RenderTexture = __RenderTexture__
+export type RenderTexture
+
+
+make :: {} -> RenderTexture
+export make = extern "madsfml__renderTexture__make"
+
+create :: Short -> Short -> RenderTexture -> Boolean
+export create = extern "madsfml__renderTexture__create"
+
+createWithAntialiasing :: Short -> Short -> Short -> RenderTexture -> Boolean
+export createWithAntialiasing = extern "madsfml__renderTexture__createWithAntialiasing"
+
+display :: RenderTexture -> {}
+export display = extern "madsfml__renderTexture__display"
+
+
+clearFFI :: Short -> RenderTexture -> {}
+clearFFI = extern "madsfml__renderTexture__clear"
+
+clear :: Color -> RenderTexture -> {}
+export clear = (color, window) => pipe(
+  colorToShort,
+  clearFFI($, window),
+)(color)
+
+
+getView :: RenderTexture -> View
+export getView = extern "madsfml__renderTexture__getView"
+
+
+setView :: View -> RenderTexture -> RenderTexture
+export setView = extern "madsfml__renderTexture__setView"
+
+
+getDefaultView :: RenderTexture -> View
+export getDefaultView = extern "madsfml__renderTexture__getDefaultView"
+
+
+setFrameRateLimit :: Short -> RenderTexture -> RenderTexture
+export setFrameRateLimit = extern "madsfml__renderTexture__setFrameRateLimit"
+
+
+mapPixelToCoords :: Short -> Short -> View -> RenderTexture -> Vector2 Float
+export mapPixelToCoords = extern "madsfml__renderTexture__mapPixelToCoords"
+
+
+mapCoordsToPixel :: Float -> Float -> View -> RenderTexture -> Vector2 Short
+export mapCoordsToPixel = extern "madsfml__renderTexture__mapCoordsToPixel"
+
+getTexture :: RenderTexture -> Texture
+export getTexture = extern "madsfml__renderTexture__getTexture"

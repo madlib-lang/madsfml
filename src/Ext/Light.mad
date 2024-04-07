@@ -3,14 +3,17 @@ import type { Shader } from "../Shader"
 import type { VertexBuffer } from "../VertexBuffer"
 
 import Array from "Array"
+import Byte from "Byte"
 import Short from "Short"
 
 import BlendMode from "../BlendMode"
 import Circle from "../Circle"
+import Color from "../Color"
 import Math from "../Math"
 import PrimitiveType from "../PrimitiveType"
 import Rectangle from "../Rectangle"
 import RenderStates from "../RenderStates"
+import RenderTexture from "../RenderTexture"
 import Shader from "../Shader"
 import Vertex from "../Vertex"
 import VertexBuffer from "../VertexBuffer"
@@ -20,6 +23,7 @@ import Window from "../Window"
 
 
 V_SHADER_LIGHT = `
+#version 120
 varying vec2 vLightPosition;
 varying vec2 vPosition;
 uniform vec2 uLightPosition;
@@ -35,9 +39,11 @@ F_SHADER_LIGHT = `
 #version 120
 varying vec2 vLightPosition;
 varying vec2 vPosition;
+uniform vec4 uLightColor;
 
 void main() {
-  vec4 lightColor = vec4(0.2, 0.2, 0.2, 1.0);
+  vec4 _uLightColor = vec4(0.1, 0.01, 0.01, 1.0);
+  vec2 lp = vec2(0.0, 0.0);
   float distance = length(vLightPosition - vPosition);
   float constant = .2;
   float linear = 3.0;
@@ -45,13 +51,14 @@ void main() {
   // float attenuation = 1.0 / (distance * distance);
   float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
 
-  vec4 color = vec4(attenuation * lightColor.rgb, 1.0);
+  vec4 color = vec4(attenuation * uLightColor.rgb, 1.0);
 
   gl_FragColor = color;
 }
 `
 
 V_SHADER_SHADOW = `
+#version 120
 #extension GL_EXT_gpu_shader4 : require
 uniform vec2 uLightPosition;
 
@@ -67,6 +74,7 @@ void main() {
 `
 
 F_SHADER_SHADOW = `
+#version 120
 uniform float uResolution;
 
 void main() {
@@ -81,10 +89,7 @@ alias LightManagerData = { lightShader :: Shader, shadowShader :: Shader }
 type LightManager = LightManager(LightManagerData)
 export type LightManager
 
-alias LightData = {
-  casterBuffers :: Array VertexBuffer,
-  position :: Vector2 Float,
-}
+alias LightData = { casterBuffers :: Array VertexBuffer, color :: Color, position :: Vector2 Float }
 
 type Light = Light(LightData)
 export type Light
@@ -110,16 +115,8 @@ LIGHT_BLENDING_MODE = BlendMode.makeWithAlpha(
   BlendMode.Zero,
   BlendMode.Add,
 )
-SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(
-  BlendMode.Zero,
-  BlendMode.One,
-  BlendMode.Add,
-  BlendMode.Zero,
-  BlendMode.Zero,
-  BlendMode.Add,
-)
 
-_SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(
+SHADOW_BLENDING_MODE = BlendMode.makeWithAlpha(
   BlendMode.Zero,
   BlendMode.One,
   BlendMode.Add,
@@ -139,6 +136,17 @@ export setPosition = (x, y, light) => where(light) {
 }
 
 
+setColor :: Color -> Light -> Light
+export setColor = (color, light) => where(light) {
+  Light(data) =>
+    do {
+      data.color := color
+      return light
+    }
+}
+
+
+
 drawBuffersWithRenderStates :: Array VertexBuffer -> RenderStates -> Window -> {}
 drawBuffersWithRenderStates = (buffers, rs, window) => {
   i = 0
@@ -148,9 +156,20 @@ drawBuffersWithRenderStates = (buffers, rs, window) => {
   }
 }
 
+drawBuffersWithRenderStatesToTexture :: Array VertexBuffer -> RenderStates -> RenderTexture -> {}
+drawBuffersWithRenderStatesToTexture = (buffers, rs, renderTexture) => {
+  i = 0
+  while(i < Array.length(buffers)) do {
+    VertexBuffer.drawToTextureWithRenderStates(buffers[i], rs, renderTexture)
+    i := i + 1
+  }
+}
 
-draw :: LightManager -> Light -> Window -> {}
-export draw = (manager, light, window) => {
+
+type Target = WindowTarget(Window) | TextureTarget(RenderTexture)
+
+_draw :: LightManager -> Light -> Window -> Target -> {}
+export _draw = (manager, light, window, target) => {
   rect = pipe(
     Window.getView,
     View.getSize,
@@ -177,9 +196,6 @@ export draw = (manager, light, window) => {
   shadowRenderStates = RenderStates.default()
   RenderStates.setShader(shaders.shadowShader, shadowRenderStates)
   RenderStates.setBlendMode(SHADOW_BLENDING_MODE, shadowRenderStates)
-  _shadowRenderStates = RenderStates.default()
-  RenderStates.setShader(shaders.shadowShader, _shadowRenderStates)
-  RenderStates.setBlendMode(_SHADOW_BLENDING_MODE, _shadowRenderStates)
 
   resolution = 36
   radius = 20
@@ -192,7 +208,17 @@ export draw = (manager, light, window) => {
         i = 0
         Shader.setFloatUniform("uResolution", Short.toFloat(resolution + 1), shaders.shadowShader)
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.shadowShader)
-        drawBuffersWithRenderStates(lightData.casterBuffers, _shadowRenderStates, window)
+        where(target) {
+          WindowTarget(win) =>
+            drawBuffersWithRenderStates(lightData.casterBuffers, shadowRenderStates, window)
+
+          TextureTarget(renderTexture) =>
+            drawBuffersWithRenderStatesToTexture(
+              lightData.casterBuffers,
+              shadowRenderStates,
+              renderTexture,
+            )
+        }
 
         while(i < resolution) do {
           where(Circle.getPoint(i, c)) {
@@ -209,22 +235,50 @@ export draw = (manager, light, window) => {
                   y + _y - radius,
                   shaders.shadowShader,
                 )
-                drawBuffersWithRenderStates(
-                  lightData.casterBuffers,
-                  _shadowRenderStates,
-                  window,
-                )
+                where(target) {
+                  WindowTarget(win) =>
+                    drawBuffersWithRenderStates(lightData.casterBuffers, shadowRenderStates, window)
+
+                  TextureTarget(renderTexture) =>
+                    drawBuffersWithRenderStatesToTexture(
+                      lightData.casterBuffers,
+                      shadowRenderStates,
+                      renderTexture,
+                    )
+                }
               }
           }
           i := i + 1
         }
 
+        where(lightData.color) {
+          Color.Color(r, g, b, a) =>
+            Shader.setVec4Uniform(
+              "uLightColor",
+              r / 255,
+              g / 255,
+              b / 255,
+              a / 255,
+              shaders.lightShader,
+            )
+        }
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.lightShader)
-        Rectangle.drawWithRenderStates(rect, lightRenderStates, window)
+        where(target) {
+          WindowTarget(win) =>
+            Rectangle.drawWithRenderStates(rect, lightRenderStates, window)
+
+          TextureTarget(renderTexture) =>
+            Rectangle.drawToTextureWithRenderStates(rect, lightRenderStates, renderTexture)
+        }
       }
   }
 }
 
+draw :: LightManager -> Light -> Window -> {}
+export draw = (manager, light, window) => _draw(manager, light, window, WindowTarget(window))
+
+drawToTexture :: LightManager -> Light -> Window -> RenderTexture -> {}
+export drawToTexture = (manager, light, window, renderTexture) => _draw(manager, light, window, TextureTarget(renderTexture))
 
 buildBuffer :: Array Vertex -> VertexBuffer
 buildBuffer = (vertices) => {
@@ -239,7 +293,7 @@ make :: Vector2 Float -> Array Vertex -> Light
 export make = (position, vertices) => {
   buffer = buildBuffer(vertices)
 
-  return Light({ position, casterBuffers: Array.fromList([buffer]) })
+  return Light({ position, casterBuffers: Array.fromList([buffer]), color: Color.WHITE })
 }
 
 addRectCaster :: Rect Float -> Light -> Light
@@ -263,7 +317,6 @@ export addRectCaster = (rect, light) => {
   where(light) {
     Light({ casterBuffers }) =>
       Array.push(buildBuffer(newVertices), casterBuffers)
-      // VertexBuffer.update(newVertices, casterBuffers)
   }
 
   return light

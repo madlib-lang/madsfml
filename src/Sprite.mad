@@ -5,6 +5,7 @@ import type { Shader } from "./Shader"
 import type { Texture } from "./Texture"
 import type { Transform } from "./Transform"
 import type { Window } from "./Window"
+import type { RenderTexture } from "./RenderTexture"
 
 import { colorToShort, shortToColor } from "./Color"
 
@@ -90,6 +91,9 @@ export draw = extern "madsfml__sprite__draw"
 
 drawWithRenderStates :: Sprite -> RenderStates -> Window -> {}
 export drawWithRenderStates = extern "madsfml__sprite__drawWithRenderStates"
+
+drawToTextureWithRenderStates :: Sprite -> RenderStates -> RenderTexture -> {}
+export drawToTextureWithRenderStates = extern "madsfml__sprite__drawToTextureWithRenderStates"
 
 drawWithShader :: Sprite -> Shader -> Window -> {}
 export drawWithShader = extern "madsfml__sprite__drawWithShader"

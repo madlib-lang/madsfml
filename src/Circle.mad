@@ -2,6 +2,7 @@ import type { Color } from "./Color"
 import type { RenderStates } from "./RenderStates"
 import type { Transform } from "./Transform"
 import type { Window } from "./Window"
+import type { RenderTexture } from "./RenderTexture"
 import type { Rect, Vector2 } from "./Math"
 
 import { colorToShort } from "./Color"
@@ -98,3 +99,6 @@ export draw = extern "madsfml__circle__draw"
 
 drawWithRenderStates :: Circle -> RenderStates -> Window -> {}
 export drawWithRenderStates = extern "madsfml__circle__drawWithRenderStates"
+
+drawToTextureWithRenderStates :: Circle -> RenderStates -> RenderTexture -> {}
+export drawToTextureWithRenderStates = extern "madsfml__circle__drawToTextureWithRenderStates"

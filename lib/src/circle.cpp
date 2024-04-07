@@ -13,6 +13,10 @@ void madsfml__circle__drawWithRenderStates(sf::CircleShape *d, sf::RenderStates 
   window->draw(*d, *rs);
 }
 
+void madsfml__circle__drawToTextureWithRenderStates(sf::CircleShape *d, sf::RenderStates *rs, sf::RenderTexture *renderTexture) {
+  renderTexture->draw(*d);
+}
+
 int32_t madsfml__circle__getFillColor(sf::CircleShape *circle) { return circle->getFillColor().toInteger(); }
 
 sf::CircleShape *madsfml__circle__setFillColor(int32_t color, sf::CircleShape *c) {

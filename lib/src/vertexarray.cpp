@@ -33,6 +33,12 @@ void madsfml__vertexarray__drawWithRenderStates(sf::VertexArray *va,
   window->draw(*va, *rs);
 }
 
+void madsfml__vertexarray__drawToTextureWithRenderStates(sf::VertexArray *va,
+                                                sf::RenderStates *rs,
+                                                sf::RenderTexture *renderTexture) {
+  renderTexture->draw(*va, *rs);
+}
+
 #ifdef __cplusplus
 }
 #endif

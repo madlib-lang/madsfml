@@ -20,3 +20,5 @@ export shortToColor = (s) => Color(
   Short.toByte(s >> 8& 0xff),
   Short.toByte(s & 0xff),
 )
+
+export WHITE = Color(255, 255, 255, 255)

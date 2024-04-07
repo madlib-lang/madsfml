@@ -14,6 +14,7 @@ OBJS :=\
   $(BUILDDIR)/math.o            \
   $(BUILDDIR)/rectangle.o       \
   $(BUILDDIR)/renderstates.o    \
+  $(BUILDDIR)/rendertexture.o   \
   $(BUILDDIR)/shader.o          \
   $(BUILDDIR)/sprite.o          \
   $(BUILDDIR)/text.o            \
