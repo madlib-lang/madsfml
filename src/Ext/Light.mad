@@ -20,36 +20,34 @@ import Window from "../Window"
 
 
 V_SHADER_LIGHT = `
-varying vec2 v_uv;
 varying vec2 vLightPosition;
-uniform vec2 uLightPosition;
 varying vec2 vPosition;
-
-uniform mat4 u_matrix;
+uniform vec2 uLightPosition;
 
 void main() {
   vLightPosition = (gl_ModelViewProjectionMatrix * vec4(uLightPosition.xy, 0, 1)).xy;
-
   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-  gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
   vPosition = gl_Position.xy;
 }
 `
 
 F_SHADER_LIGHT = `
+#version 120
 varying vec2 vLightPosition;
 varying vec2 vPosition;
 
 void main() {
-  vec2 v_uv = gl_TexCoord[0].xy;
-  vec4 u_color = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 lightColor = vec4(0.2, 0.2, 0.2, 1.0);
   float distance = length(vLightPosition - vPosition);
-  float constant = 1.0;
-  float linear = 10.0;
-  float quadratic = 7.5;
+  float constant = .2;
+  float linear = 3.0;
+  float quadratic = 15;
+  // float attenuation = 1.0 / (distance * distance);
   float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
 
-  gl_FragColor = vec4(attenuation * u_color.rgb, 1.0);
+  vec4 color = vec4(attenuation * lightColor.rgb, 1.0);
+
+  gl_FragColor = color;
 }
 `
 
@@ -84,8 +82,7 @@ type LightManager = LightManager(LightManagerData)
 export type LightManager
 
 alias LightData = {
-  casterPositions :: Array Vertex,
-  castersBuffer :: VertexBuffer,
+  casterBuffers :: Array VertexBuffer,
   position :: Vector2 Float,
 }
 
@@ -142,6 +139,16 @@ export setPosition = (x, y, light) => where(light) {
 }
 
 
+drawBuffersWithRenderStates :: Array VertexBuffer -> RenderStates -> Window -> {}
+drawBuffersWithRenderStates = (buffers, rs, window) => {
+  i = 0
+  while(i < Array.length(buffers)) do {
+    VertexBuffer.drawWithRenderStates(buffers[i], rs, window)
+    i := i + 1
+  }
+}
+
+
 draw :: LightManager -> Light -> Window -> {}
 export draw = (manager, light, window) => {
   rect = pipe(
@@ -174,7 +181,7 @@ export draw = (manager, light, window) => {
   RenderStates.setShader(shaders.shadowShader, _shadowRenderStates)
   RenderStates.setBlendMode(_SHADOW_BLENDING_MODE, _shadowRenderStates)
 
-  resolution = 30
+  resolution = 36
   radius = 20
   c = Circle.make(radius)
   Circle.setPointCount(resolution, c)
@@ -185,7 +192,7 @@ export draw = (manager, light, window) => {
         i = 0
         Shader.setFloatUniform("uResolution", Short.toFloat(resolution + 1), shaders.shadowShader)
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.shadowShader)
-        VertexBuffer.drawWithRenderStates(lightData.castersBuffer, _shadowRenderStates, window)
+        drawBuffersWithRenderStates(lightData.casterBuffers, _shadowRenderStates, window)
 
         while(i < resolution) do {
           where(Circle.getPoint(i, c)) {
@@ -202,8 +209,8 @@ export draw = (manager, light, window) => {
                   y + _y - radius,
                   shaders.shadowShader,
                 )
-                VertexBuffer.drawWithRenderStates(
-                  lightData.castersBuffer,
+                drawBuffersWithRenderStates(
+                  lightData.casterBuffers,
                   _shadowRenderStates,
                   window,
                 )
@@ -212,20 +219,27 @@ export draw = (manager, light, window) => {
           i := i + 1
         }
 
-
         Shader.setVec2Uniform("uLightPosition", x, y, shaders.lightShader)
         Rectangle.drawWithRenderStates(rect, lightRenderStates, window)
       }
   }
 }
 
-make :: Vector2 Float -> Array Vertex -> Light
-export make = (position, casterPositions) => {
-  castersBuffer = VertexBuffer.makeWithPrimitiveType(PrimitiveType.TriangleStrip)
-  VertexBuffer.allocate(Short.fromInteger(Array.length(casterPositions)), castersBuffer)
-  VertexBuffer.update(casterPositions, castersBuffer)
 
-  return Light({ position, casterPositions, castersBuffer })
+buildBuffer :: Array Vertex -> VertexBuffer
+buildBuffer = (vertices) => {
+  buffer = VertexBuffer.makeWithPrimitiveType(PrimitiveType.TriangleStrip)
+  VertexBuffer.allocate(Short.fromInteger(Array.length(vertices)), buffer)
+  VertexBuffer.update(vertices, buffer)
+  return buffer
+}
+
+
+make :: Vector2 Float -> Array Vertex -> Light
+export make = (position, vertices) => {
+  buffer = buildBuffer(vertices)
+
+  return Light({ position, casterBuffers: Array.fromList([buffer]) })
 }
 
 addRectCaster :: Rect Float -> Light -> Light
@@ -247,11 +261,9 @@ export addRectCaster = (rect, light) => {
   }
 
   where(light) {
-    Light({ casterPositions, castersBuffer }) =>
-      do {
-        Array.weld(casterPositions, newVertices)
-        VertexBuffer.update(casterPositions, castersBuffer)
-      }
+    Light({ casterBuffers }) =>
+      Array.push(buildBuffer(newVertices), casterBuffers)
+      // VertexBuffer.update(newVertices, casterBuffers)
   }
 
   return light
