@@ -21,7 +21,7 @@ bool madsfml__renderTexture__createWithAntialiasing(int32_t w, int32_t h, int32_
                                                     sf::RenderTexture *renderTexture) {
   sf::ContextSettings settings;
   settings.antialiasingLevel = antialiasing;
-  settings.sRgbCapable = true;
+  // settings.sRgbCapable = true;
   return renderTexture->create(w, h, settings);
 }
 
